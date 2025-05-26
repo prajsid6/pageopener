@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URL Opener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        input, select, button {
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="urlInput" placeholder="Enter URL here">
+        <select id="openType">
+            <option value="tab">Open in Tab</option>
+            <option value="window">Open in Window</option>
+        </select>
+        <button onclick="openURL()">Open</button>
+    </div>
+
+    <script>
+        function openURL() {
+            const url = document.getElementById('urlInput').value;
+            const openType = document.getElementById('openType').value;
+            
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+
+            // Add http:// if not present
+            let formattedUrl = url;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                formattedUrl = 'http://' + url;
+            }
+
+            if (openType === 'tab') {
+                window.open(formattedUrl, '_blank');
+            } else {
+                window.open(formattedUrl, '_blank', 'width=800,height=600');
+            }
+        }
+    </script>
+</body>
+</html>
