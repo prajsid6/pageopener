@@ -20,8 +20,6 @@ input,textarea,button{width:100%;padding:8px;margin-top:5px;font-size:16px;}
 .lang-btn{border:1px solid #ccc;border-radius:5px;padding:6px 12px;margin:3px;cursor:pointer;}
 .lang-btn.selected{background:#007bff;color:white;border-color:#007bff;}
 .generator{display:none;}
-table{width:100%;border-collapse:collapse;margin-top:15px;}
-th,td{border:1px solid #ccc;padding:6px;text-align:left;}
 .copy-btn{display:inline-block;background:#007bff;color:white;padding:3px 6px;border-radius:4px;cursor:pointer;margin-top:4px;font-size:12px;}
 .copy-btn:hover{background:#0056b3;}
 #disclaimer{background:#ffcc00;color:#333;padding:10px;text-align:center;position:fixed;top:0;left:0;width:100%;font-weight:bold;z-index:9999;}
@@ -31,6 +29,16 @@ th,td{border:1px solid #ccc;padding:6px;text-align:left;}
 .social-icons{display:flex;justify-content:center;gap:15px;margin-top:10px;}
 .social-icons a{text-decoration:none;font-size:22px;color:#333;}
 .social-icons a:hover{color:#007bff;}
+.trending-container{margin-top:20px;background:#f7f7f7;padding:10px;border-radius:8px;box-shadow:0 0 5px rgba(0,0,0,0.1);}
+.trending-header{display:flex;justify-content:space-between;align-items:center;}
+.trending-header h3{margin:0;}
+.refresh-btn{background:#007bff;color:white;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:14px;}
+.refresh-btn:hover{background:#0056b3;}
+.trending-post{border-bottom:1px solid #ddd;padding:8px 0;}
+.trending-post:last-child{border:none;}
+.trending-post h4{margin:0;font-size:16px;color:#333;}
+.trending-post p{margin:4px 0;font-size:14px;}
+.trending-platform{font-size:12px;color:#555;}
 </style>
 </head>
 <body>
@@ -69,6 +77,15 @@ th,td{border:1px solid #ccc;padding:6px;text-align:left;}
   <p><b>Followers:</b> <span id="followers">0</span></p>
   <p><b>Engagement Rate:</b> <span id="engagement">0%</span></p>
   <p><b>Posts This Week:</b> <span id="posts">0</span></p>
+
+  <!-- 🔥 What's Trending Section -->
+  <div class="trending-container">
+    <div class="trending-header">
+      <h3>🔥 What's Trending</h3>
+      <button class="refresh-btn" onclick="loadTrending()">🔄 Refresh</button>
+    </div>
+    <div id="trending-list"></div>
+  </div>
 </div>
 
 <!-- Caption Generator -->
@@ -236,6 +253,35 @@ function randomize(){
   document.getElementById('posts').textContent=Math.floor(Math.random()*7+1);
 }
 randomize();
+
+// Trending Section
+function loadTrending(){
+  const platforms=["Instagram","Twitter","YouTube","LinkedIn"];
+  const samplePosts=[
+    "Exploring hidden gems around the world 🌍",
+    "AI is transforming how we create and share ideas 🤖",
+    "Dance Challenge hits 10M views in 3 days! 💃",
+    "Remote jobs are evolving — 2025 trends you must see 💼",
+    "Street food diaries from Bengaluru 🍲",
+    "Photography hacks to get viral shots 📸"
+  ];
+  let posts=[];
+  for(let i=0;i<4;i++){
+    posts.push({
+      platform:platforms[i],
+      title:samplePosts[Math.floor(Math.random()*samplePosts.length)],
+      text:"Trending now on "+platforms[i]+"!"
+    });
+  }
+  const list=document.getElementById('trending-list');
+  list.innerHTML=posts.map(p=>`
+    <div class="trending-post">
+      <h4>${p.title}</h4>
+      <p>${p.text}</p>
+      <span class="trending-platform">📱 ${p.platform}</span>
+    </div>`).join('');
+}
+loadTrending();
 </script>
 </body>
 </html>
