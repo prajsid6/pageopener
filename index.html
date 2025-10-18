@@ -7,6 +7,7 @@
     body { font-family: Arial; max-width: 900px; margin: auto; padding: 20px; }
     h1 { text-align: center; }
     input, button { margin: 5px 0; padding: 8px; font-size: 16px; }
+    label { font-weight: bold; display: block; margin-top: 10px; }
     .language-buttons { display: flex; flex-wrap: wrap; margin-bottom: 10px; }
     .lang-btn {
       border: 1px solid #ccc; padding: 8px 12px; margin: 3px; border-radius: 5px;
@@ -15,9 +16,12 @@
     .lang-btn:hover { background-color: #e0e0e0; }
     .lang-btn.selected { background-color: #007bff; color: #fff; border-color: #007bff; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; position: relative; }
     #loading { display: none; color: #007bff; font-weight: bold; }
-    .copy-btn { cursor: pointer; margin-left: 5px; color: #007bff; }
+    .copy-btn {
+      cursor: pointer; position: absolute; bottom: 5px; right: 5px; font-size: 16px;
+      color: #007bff; user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -152,11 +156,13 @@ Format as JSON array with keys for each selected language.
       const tr = document.createElement('tr');
       languages.forEach(lang => {
         const td = document.createElement('td');
+        td.style.position = 'relative';
+
         const textSpan = document.createElement('span');
         textSpan.textContent = item[lang] || '';
         td.appendChild(textSpan);
 
-        // Copy button
+        // Copy button at bottom-right
         const copyBtn = document.createElement('span');
         copyBtn.innerHTML = '📋';
         copyBtn.title = 'Copy';
