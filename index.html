@@ -16,13 +16,18 @@
     .lang-btn:hover { background-color: #e0e0e0; }
     .lang-btn.selected { background-color: #007bff; color: #fff; border-color: #007bff; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; position: relative; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; }
     #loading { display: none; color: #007bff; font-weight: bold; }
     .copy-btn {
-      position: absolute; bottom: 5px; right: 5px;
-      font-size: 12px; padding: 2px 6px;
-      background-color: #007bff; color: #fff; border-radius: 4px;
-      cursor: pointer; user-select: none;
+      display: inline-block;
+      margin-top: 5px;
+      font-size: 12px;
+      padding: 2px 6px;
+      background-color: #007bff; 
+      color: #fff; 
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
     }
     .copy-btn:hover { background-color: #0056b3; }
   </style>
@@ -59,13 +64,11 @@
 </table>
 
 <script>
-  // Toggle language selection
   const langButtons = document.querySelectorAll('.lang-btn');
   langButtons.forEach(btn => {
     btn.addEventListener('click', () => btn.classList.toggle('selected'));
   });
 
-  // Default captions fallback
   const defaultCaptions = [
     {
       "English": "Delicious pizza loaded with cheese! 🍕",
@@ -98,10 +101,7 @@
     const languages = Array.from(document.querySelectorAll('.lang-btn.selected')).map(b => b.dataset.lang);
     const count = parseInt(document.getElementById('count').value);
 
-    if (!languages.length) {
-      alert("Please select at least one language.");
-      return;
-    }
+    if (!languages.length) { alert("Please select at least one language."); return; }
 
     document.getElementById('loading').style.display = 'block';
     document.getElementById('resultTable').style.display = 'none';
@@ -159,21 +159,23 @@ Format as JSON array with keys for each selected language.
       const tr = document.createElement('tr');
       languages.forEach(lang => {
         const td = document.createElement('td');
-        td.style.position = 'relative';
 
         const textSpan = document.createElement('span');
         textSpan.textContent = item[lang] || '';
         td.appendChild(textSpan);
 
-        // Modern copy button at bottom-right
+        // Copy button below caption
         const copyBtn = document.createElement('span');
         copyBtn.textContent = 'Copy';
         copyBtn.title = 'Copy';
         copyBtn.className = 'copy-btn';
         copyBtn.onclick = () => {
           navigator.clipboard.writeText(textSpan.textContent);
-          alert(`Copied to clipboard: ${textSpan.textContent}`);
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => { copyBtn.textContent = originalText; }, 3000);
         };
+        td.appendChild(document.createElement('br'));
         td.appendChild(copyBtn);
 
         tr.appendChild(td);
