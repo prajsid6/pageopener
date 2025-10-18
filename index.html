@@ -4,18 +4,21 @@
 <meta charset="UTF-8">
 <title>Social Media Buddy</title>
 <style>
-  body { font-family: Arial; margin:0; padding:0; display:flex; height:100vh; }
-  #sidebar { width: 200px; background:#333; color:#fff; display:flex; flex-direction:column; transition: 0.3s; }
-  #sidebar.hide { margin-left:-200px; }
+  body { margin:0; font-family:Arial; overflow-x:hidden; }
+  #sidebar {
+    position:fixed; top:0; left:0; height:100%; width:200px; background:#333; color:#fff; display:flex; flex-direction:column; transition:0.3s; z-index:2;
+  }
+  #sidebar.hide { left:-200px; }
   #sidebar h2 { text-align:center; padding:10px 0; }
   #sidebar button { background:none; border:none; color:#fff; text-align:left; padding:10px; cursor:pointer; font-size:16px; }
   #sidebar button:hover { background:#444; }
-  #content { flex:1; padding:20px; overflow:auto; }
-  #hamburger { position:absolute; top:10px; left:10px; font-size:24px; cursor:pointer; color:#333; transition: 0.3s; }
+  #content { margin-left:200px; padding:20px; transition:0.3s; overflow:auto; min-height:100vh; }
+  #sidebar.hide + #content { margin-left:0; }
+  #hamburger { position:fixed; top:10px; left:10px; font-size:24px; cursor:pointer; color:#333; z-index:3; transition:0.3s; }
   #hamburger.collapsed { color:#fff; }
   h1 { text-align:center; }
   label { font-weight:bold; display:block; margin-top:10px; }
-  input, button, textarea { margin:5px 0; padding:8px; font-size:16px; }
+  input, button, textarea { margin:5px 0; padding:8px; font-size:16px; width:100%; }
   .language-buttons { display:flex; flex-wrap:wrap; margin-bottom:10px; }
   .lang-btn { border:1px solid #ccc; padding:8px 12px; margin:3px; border-radius:5px; cursor:pointer; background:#f9f9f9; transition:0.2s; }
   .lang-btn:hover { background:#e0e0e0; }
@@ -26,7 +29,7 @@
   .copy-btn:hover { background:#0056b3; }
   #loading { display:none; color:#007bff; font-weight:bold; }
   .generator { display:none; }
-  textarea { width:100%; min-height:60px; }
+  textarea { min-height:60px; }
 </style>
 </head>
 <body>
@@ -116,107 +119,84 @@ hamburger.addEventListener('click', ()=>{
   hamburger.classList.toggle('collapsed');
 });
 
+// Show generator
 function showGenerator(id) {
   document.querySelectorAll('.generator').forEach(g=>g.style.display='none');
   document.getElementById(id).style.display='block';
 }
 showGenerator('caption'); // default
 
-// Toggle language selection
+// Language toggle
 document.querySelectorAll('.language-buttons').forEach(div=>{
   div.querySelectorAll('.lang-btn').forEach(btn=>{
     btn.addEventListener('click',()=>btn.classList.toggle('selected'));
   });
 });
 
-// Dummy fallback captions
+// Dummy fallback data
 const defaultCaptions = [
   {"English":"Delicious pizza 🍕","Kannada":"ಚೀಸ್ ಪಿಜ್ಜಾ 🍕","Hindi":"पिज़्ज़ा 🍕"},
   {"English":"Fresh croissants 🥐","Kannada":"ಕ್ರೋಸಾಂ 🥐","Hindi":"क्रोइसाँस 🥐"},
   {"English":"Healthy smoothie 🍏","Kannada":"ಹಸಿರು ಸ್ಮೂದಿ 🍏","Hindi":"हरी स्मूदी 🍏"}
 ];
-
-// Dummy memes
 const defaultMemes = [
   {"English":"When code works on first try 😂","Kannada":"ಮೊದಲ ಪ್ರಯತ್ನದಲ್ಲಿ ಕೋಡ್ ಕೆಲಸ ಮಾಡುತ್ತಿದೆ 😂","Hindi":"कोड पहली कोशिश में काम कर गया 😂"},
   {"English":"Debugging be like 🤯","Kannada":"ಡಿಬಗಿಂಗ್ ಹೀಗಿದೆ 🤯","Hindi":"डिबगिंग ऐसा है 🤯"},
   {"English":"Coffee first, then commit ☕","Kannada":"ಮೊದಲು ಕಾಫಿ, ನಂತರ ಕಮಿಟ್ ☕","Hindi":"पहले कॉफी, फिर कमिट ☕"}
 ];
-
-// Dummy bios
 const defaultBios = [
   {"English":"Software Tester | Coffee Lover","Kannada":"ಸಾಫ್ಟ್‌ವೇರ್ ಟೆಸ್ಟರ್ | ಕಾಫಿ ಪ್ರಿಯ","Hindi":"सॉफ्टवेयर टेस्टर | कॉफ़ी प्रेमी"},
   {"English":"QA Engineer | Problem Solver","Kannada":"QA ಎಂಜಿನಿಯರ್ | ಸಮಸ್ಯೆ ಪರಿಹಾರಕ","Hindi":"QA इंजीनियर | समस्या हल करने वाला"}
 ];
 
-// Caption Generator
+// Caption generator
 function generateCaptions(){
   const topic = document.getElementById('caption-topic').value;
   const langs = Array.from(document.getElementById('caption-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
   const count = parseInt(document.getElementById('caption-count').value);
-  const loading = document.getElementById('caption-loading');
-  const table = document.getElementById('caption-table');
+  const loading = document.getElementById('caption-loading'); const table = document.getElementById('caption-table');
   loading.style.display='block'; table.style.display='none';
-  
-  // For demo fallback
   setTimeout(()=>{
-    const data = [];
-    for(let i=0;i<count;i++) data.push(defaultCaptions[i % defaultCaptions.length]);
-    displayTable('caption', data, langs);
-    loading.style.display='none';
+    const data=[]; for(let i=0;i<count;i++) data.push(defaultCaptions[i%defaultCaptions.length]);
+    displayTable('caption',data,langs); loading.style.display='none';
   },500);
 }
 
-// Meme Generator
+// Meme generator
 function generateMeme(){
   const text = document.getElementById('meme-text').value;
   const langs = Array.from(document.getElementById('meme-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
   const count = parseInt(document.getElementById('meme-count').value);
-  const loading = document.getElementById('meme-loading');
-  const table = document.getElementById('meme-table');
+  const loading = document.getElementById('meme-loading'); const table = document.getElementById('meme-table');
   loading.style.display='block'; table.style.display='none';
-
   setTimeout(()=>{
-    const data = [];
-    for(let i=0;i<count;i++){
-      data.push(defaultMemes[i % defaultMemes.length]);
-    }
-    displayTable('meme', data, langs);
-    loading.style.display='none';
+    const data=[]; for(let i=0;i<count;i++) data.push(defaultMemes[i%defaultMemes.length]);
+    displayTable('meme',data,langs); loading.style.display='none';
   },500);
 }
 
-// Bio Generator
+// Bio generator
 function generateBio(){
   const topic = document.getElementById('bio-topic').value.trim() || "Software Tester";
   const langs = Array.from(document.getElementById('bio-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
-  const loading = document.getElementById('bio-loading');
-  const table = document.getElementById('bio-table');
+  const loading = document.getElementById('bio-loading'); const table = document.getElementById('bio-table');
   loading.style.display='block'; table.style.display='none';
-
   setTimeout(()=>{
-    const data = [];
-    // User input bio
-    const bioObj = {};
-    langs.forEach(l=>{
-      bioObj[l] = topic + " Bio in " + l;
-    });
+    const data=[];
+    const bioObj={};
+    langs.forEach(l=>{ bioObj[l]=topic + " Bio in " + l; });
     data.push(bioObj);
-    // Add dummy bios for Software Tester
     defaultBios.forEach(d=>data.push(d));
-    displayTable('bio', data, langs);
+    displayTable('bio',data,langs);
     loading.style.display='none';
   },500);
 }
 
-// Helper to display table
-function displayTable(type, data, langs){
-  const tableBody = document.getElementById(type+'-body');
-  const header = document.getElementById(type+'-header');
+// Table display helper
+function displayTable(type,data,langs){
+  const tableBody = document.getElementById(type+'-body'); const header = document.getElementById(type+'-header');
   header.innerHTML=''; tableBody.innerHTML='';
-  langs.forEach(l=>{
-    const th=document.createElement('th'); th.textContent=l; header.appendChild(th);
-  });
+  langs.forEach(l=>{ const th=document.createElement('th'); th.textContent=l; header.appendChild(th); });
   data.forEach(item=>{
     const tr=document.createElement('tr');
     langs.forEach(l=>{
@@ -226,4 +206,16 @@ function displayTable(type, data, langs){
       copyBtn.onclick=()=>{
         navigator.clipboard.writeText(span.textContent);
         const original=copyBtn.textContent; copyBtn.textContent='Copied!';
-        setTimeout(()=>{copy
+        setTimeout(()=>{copyBtn.textContent=original;},3000);
+      };
+      td.appendChild(document.createElement('br')); td.appendChild(copyBtn);
+      tr.appendChild(td);
+    });
+    tableBody.appendChild(tr);
+  });
+  document.getElementById(type+'-table').style.display='table';
+}
+</script>
+
+</body>
+</html>
