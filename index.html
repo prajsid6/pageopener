@@ -27,8 +27,8 @@ th, td { border:1px solid #ccc; padding:8px; text-align:left; vertical-align:top
 .generator { display:none; }
 textarea { min-height:60px; }
 /* Disclaimer */
-#disclaimer { background:#ffcc00; color:#333; padding:10px; text-align:center; font-weight:bold; position:fixed; top:0; left:0; width:100%; z-index:5; }
-#disclaimer button { margin-left:10px; padding:4px 8px; cursor:pointer; }
+#disclaimer { background:#ffcc00; color:#333; padding:10px; text-align:center; font-weight:bold; position:fixed; top:0; left:0; width:100%; z-index:9999; }
+#disclaimer button { margin-left:10px; padding:4px 8px; cursor:pointer; position:relative; z-index:10000; }
 </style>
 </head>
 <body>
@@ -36,7 +36,7 @@ textarea { min-height:60px; }
 <!-- Disclaimer -->
 <div id="disclaimer">
   ⚠️ This is a demo application. All generated content is for reference only.
-  <button onclick="hideDisclaimer()">OKAY</button>
+  <button id="disclaimer-btn">OKAY</button>
 </div>
 
 <div id="hamburger">☰</div>
@@ -77,7 +77,7 @@ textarea { min-height:60px; }
   <label>Number of Captions:</label>
   <input type="number" id="caption-count" value="5" min="1" max="20">
   <button onclick="generateCaptions()">Generate Captions</button>
-  <div id="caption-loading">Generating captions... ⏳</div>
+  <div id="caption-loading" style="display:none;">Generating captions... ⏳</div>
   <table id="caption-table" style="display:none;">
     <thead><tr id="caption-header"></tr></thead>
     <tbody id="caption-body"></tbody>
@@ -98,7 +98,7 @@ textarea { min-height:60px; }
   <label>Number of Memes:</label>
   <input type="number" id="meme-count" value="3" min="1" max="10">
   <button onclick="generateMeme()">Generate Memes</button>
-  <div id="meme-loading">Generating memes... ⏳</div>
+  <div id="meme-loading" style="display:none;">Generating memes... ⏳</div>
   <table id="meme-table" style="display:none;">
     <thead><tr id="meme-header"></tr></thead>
     <tbody id="meme-body"></tbody>
@@ -117,7 +117,7 @@ textarea { min-height:60px; }
     <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
   </div>
   <button onclick="generateBio()">Generate Bios</button>
-  <div id="bio-loading">Generating bios... ⏳</div>
+  <div id="bio-loading" style="display:none;">Generating bios... ⏳</div>
   <table id="bio-table" style="display:none;">
     <thead><tr id="bio-header"></tr></thead>
     <tbody id="bio-body"></tbody>
@@ -127,15 +127,17 @@ textarea { min-height:60px; }
 </div>
 
 <script>
-// Sidebar toggle
-const hamburger = document.getElementById('hamburger');
-const sidebar = document.getElementById('sidebar');
-hamburger.addEventListener('click', ()=>{ sidebar.classList.toggle('hide'); });
+// Hamburger toggle
+document.getElementById('hamburger').addEventListener('click', ()=>{
+  document.getElementById('sidebar').classList.toggle('hide');
+});
 
-// Disclaimer
-function hideDisclaimer() { document.getElementById('disclaimer').style.display='none'; }
+// Disclaimer OKAY button
+document.getElementById('disclaimer-btn').addEventListener('click', ()=>{
+  document.getElementById('disclaimer').style.display='none';
+});
 
-// Guest login for app (once)
+// Guest login for app
 function checkGuest() {
   let guestName = sessionStorage.getItem('guestName');
   if(!guestName){
@@ -145,7 +147,7 @@ function checkGuest() {
   }
   document.getElementById('guest-welcome').innerHTML = "Welcome, " + guestName + "!";
 }
-checkGuest(); // run once on page load
+checkGuest();
 
 // Show generator
 function showGenerator(id) {
@@ -153,7 +155,25 @@ function showGenerator(id) {
   document.getElementById(id).style.display='block';
 }
 
-// Dummy fallback data
+// Logout
+function logout() {
+  sessionStorage.removeItem('guestName');
+  alert("You have been logged out!");
+  location.reload();
+}
+
+// Dummy Analytics
+function generateDummyAnalytics(){
+  const followers = Math.floor(Math.random()*10000 + 500);
+  const engagement = (Math.random()*10 + 1).toFixed(2);
+  const posts = Math.floor(Math.random()*10 + 1);
+  document.getElementById('followers-count').textContent = followers;
+  document.getElementById('engagement-rate').textContent = engagement + "%";
+  document.getElementById('posts-week').textContent = posts;
+}
+generateDummyAnalytics();
+
+// Dummy data
 const defaultCaptions = [
   {"English":"Delicious pizza 🍕","Kannada":"ಚೀಸ್ ಪಿಜ್ಜಾ 🍕","Hindi":"पिज़्ज़ा 🍕"},
   {"English":"Fresh croissants 🥐","Kannada":"ಕ್ರೋಸಾಂ 🥐","Hindi":"क्रोइसाँस 🥐"},
@@ -169,20 +189,88 @@ const defaultBios = [
   {"English":"QA Engineer | Problem Solver","Kannada":"QA ಎಂಜಿನಿಯರ್ | ಸಮಸ್ಯೆ ಪರಿಹಾರಕ","Hindi":"QA इंजीनियर | समस्या हल करने वाला"}
 ];
 
-// Caption generator
-function generateCaptions(){
-  const topic = document.getElementById('caption-topic').value;
-  const langs = Array.from(document.getElementById('caption-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
-  const count = parseInt(document.getElementById('caption-count').value);
-  const loading = document.getElementById('caption-loading'); const table = document.getElementById('caption-table');
-  loading.style.display='block'; table.style.display='none';
-  setTimeout(()=>{
-    const data=[]; for(let i=0;i<count;i++) data.push(defaultCaptions[i%defaultCaptions.length]);
-    displayTable('caption',data,langs); loading.style.display='none';
-  },500);
+// Utilities
+function getSelectedLanguages(containerId){
+  return Array.from(document.getElementById(containerId).querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
+}
+function copyToClipboard(text, btn){
+  navigator.clipboard.writeText(text).then(()=>{
+    const old = btn.textContent;
+    btn.textContent = "Copied!";
+    setTimeout(()=>{ btn.textContent = old; },3000);
+  });
 }
 
-// Meme generator
+// Display table helper
+function displayTable(type, data, langs){
+  const table = document.getElementById(type+"-table");
+  const header = document.getElementById(type+"-header");
+  const body = document.getElementById(type+"-body");
+  header.innerHTML=""; body.innerHTML="";
+  langs.forEach(l=>{ const th = document.createElement('th'); th.textContent=l; header.appendChild(th); });
+  data.forEach(item=>{
+    const tr = document.createElement('tr');
+    langs.forEach(l=>{
+      const td = document.createElement('td');
+      td.textContent = item[l] || "";
+      const copyBtn = document.createElement('div');
+      copyBtn.className="copy-btn"; copyBtn.textContent="Copy";
+      copyBtn.onclick = ()=>copyToClipboard(item[l]||"", copyBtn);
+      td.appendChild(document.createElement('br'));
+      td.appendChild(copyBtn);
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+  table.style.display='table';
+}
+
+// Generate functions
+function generateCaptions(){
+  const topic = document.getElementById('caption-topic').value;
+  const langs = getSelectedLanguages('caption-langs');
+  const count = parseInt(document.getElementById('caption-count').value);
+  document.getElementById('caption-loading').style.display='block';
+  setTimeout(()=>{
+    const data=[]; for(let i=0;i<count;i++) data.push(defaultCaptions[i%defaultCaptions.length]);
+    displayTable('caption',data,langs);
+    document.getElementById('caption-loading').style.display='none';
+  },300);
+}
 function generateMeme(){
   const text = document.getElementById('meme-text').value;
-  const langs = Array.from(document.getElementById('m
+  const langs = getSelectedLanguages('meme-langs');
+  const count = parseInt(document.getElementById('meme-count').value);
+  document.getElementById('meme-loading').style.display='block';
+  setTimeout(()=>{
+    const data=[]; for(let i=0;i<count;i++) data.push(defaultMemes[i%defaultMemes.length]);
+    displayTable('meme',data,langs);
+    document.getElementById('meme-loading').style.display='none';
+  },300);
+}
+function generateBio(){
+  const topic = document.getElementById('bio-topic').value || "Software Tester";
+  const langs = getSelectedLanguages('bio-langs');
+  document.getElementById('bio-loading').style.display='block';
+  setTimeout(()=>{
+    const data=[]; for(let i=0;i<5;i++) data.push(defaultBios[i%defaultBios.length]);
+    displayTable('bio',data,langs);
+    document.getElementById('bio-loading').style.display='none';
+  },300);
+}
+
+// Language button toggle
+document.querySelectorAll('.language-buttons').forEach(container=>{
+  container.addEventListener('click', e=>{
+    if(e.target.classList.contains('lang-btn')){
+      e.target.classList.toggle('selected');
+    }
+  });
+});
+
+// Default view
+showGenerator('dashboard');
+</script>
+
+</body>
+</html>
