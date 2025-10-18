@@ -25,25 +25,27 @@ input, textarea, select, button {width:100%; padding:8px; margin-top:5px; font-s
 
 /* ---------- Hamburger ---------- */
 #hamburger {
-  position:fixed; top:12px; left:12px; font-size:26px; color:#fffc00; cursor:pointer; z-index:1000;
+  position:fixed; top:12px; left:12px; font-size:26px; color:green; cursor:pointer; z-index:1000;
 }
 
 /* ---------- Sidebar ---------- */
 #sidebar {
-  position:fixed; left:0; top:0; width:60px; height:100%; background:#fff; border-right:1px solid #ddd; display:flex; flex-direction:column; align-items:center; padding-top:20px; transition:0.3s; z-index:999;
+  position:fixed; left:-220px; top:0; width:220px; height:100%; background:#fff; border-right:1px solid #ddd; display:flex; flex-direction:column; padding-top:20px; transition:0.3s; z-index:999;
+  box-shadow:2px 0 10px rgba(0,0,0,0.1);
 }
-#sidebar.hide {left:-60px;}
+#sidebar.show {left:0;}
 #sidebar button {
-  background:none; border:none; margin:15px 0; cursor:pointer; font-size:24px; color:#333; display:flex; flex-direction:column; align-items:center;
+  background:none; border:none; margin:15px 10px; cursor:pointer; font-size:20px; display:flex; align-items:center; padding:10px; border-radius:12px;
+  transition:0.2s;
 }
-#sidebar button span {font-size:12px; margin-top:4px;}
-#sidebar button:hover {color:#fffc00;}
+#sidebar button span {margin-left:10px; font-size:16px;}
+#sidebar button:hover {background:#fffc00; color:#000;}
+#overlay {position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.2); display:none; z-index:998;}
 
 /* ---------- Content ---------- */
 #content {
-  margin-left:60px; padding:10px; transition:0.3s;
+  margin-left:0; padding:10px; transition:0.3s;
 }
-#sidebar.hide + #content {margin-left:0;}
 
 /* ---------- Generator Cards ---------- */
 .generator {
@@ -57,10 +59,10 @@ input, textarea, select, button {width:100%; padding:8px; margin-top:5px; font-s
 }
 
 /* ---------- Buttons ---------- */
-button {
+button.action-btn {
   background:#fffc00; color:#000; border:none; border-radius:50px; padding:10px 20px; font-weight:bold; cursor:pointer; margin-top:10px;
 }
-button:hover {background:#ffe600;}
+button.action-btn:hover {background:#ffe600;}
 
 /* ---------- Copy Button ---------- */
 .copy-btn {
@@ -100,6 +102,7 @@ button:hover {background:#ffe600;}
 </div>
 
 <div id="hamburger">☰</div>
+<div id="overlay"></div>
 
 <!-- Sidebar -->
 <div id="sidebar">
@@ -147,7 +150,7 @@ button:hover {background:#ffe600;}
     <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
     <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
   </div>
-  <button onclick="generateCaption()">Generate Captions</button>
+  <button class="action-btn" onclick="generateCaption()">Generate Captions</button>
   <div id="caption-output"></div>
 </div>
 
@@ -155,7 +158,7 @@ button:hover {background:#ffe600;}
 <div id="meme" class="generator">
   <h1>Meme Generator</h1>
   <input id="meme-topic" placeholder="Enter meme idea...">
-  <button onclick="generateMeme()">Generate Meme</button>
+  <button class="action-btn" onclick="generateMeme()">Generate Meme</button>
   <div id="meme-output"></div>
 </div>
 
@@ -163,7 +166,7 @@ button:hover {background:#ffe600;}
 <div id="bio" class="generator">
   <h1>Bio Generator</h1>
   <textarea id="bio-input" placeholder="Enter your profession or vibe..."></textarea>
-  <button onclick="generateBio()">Generate Bios</button>
+  <button class="action-btn" onclick="generateBio()">Generate Bios</button>
   <div id="bio-output"></div>
 </div>
 
@@ -177,7 +180,7 @@ button:hover {background:#ffe600;}
     <option>Hindi</option>
     <option>Kannada</option>
   </select>
-  <button onclick="generatePost()">Generate Post</button>
+  <button class="action-btn" onclick="generatePost()">Generate Post</button>
   <div id="post-output"></div>
 </div>
 
@@ -185,7 +188,7 @@ button:hover {background:#ffe600;}
 <div id="video" class="generator">
   <h1>Video Downloader</h1>
   <input id="video-url" placeholder="Enter video URL...">
-  <button onclick="generateVideo()">Download</button>
+  <button class="action-btn" onclick="generateVideo()">Download</button>
   <div id="video-output"></div>
 </div>
 
@@ -199,7 +202,7 @@ button:hover {background:#ffe600;}
     <option>Hindi</option>
     <option>Kannada</option>
   </select>
-  <button onclick="generateTranslate()">Translate</button>
+  <button class="action-btn" onclick="generateTranslate()">Translate</button>
   <div id="translate-output"></div>
 </div>
 
@@ -207,7 +210,7 @@ button:hover {background:#ffe600;}
 <div id="profile" class="generator">
   <h1>Profile Search</h1>
   <input id="profile-name" placeholder="Enter username...">
-  <button onclick="searchProfile()">Search Profiles</button>
+  <button class="action-btn" onclick="searchProfile()">Search Profiles</button>
   <div id="profile-output"></div>
 </div>
 
@@ -230,33 +233,43 @@ button:hover {background:#ffe600;}
 </div>
 
 <script>
-// Sidebar toggle
-document.getElementById('hamburger').onclick = () => document.getElementById('sidebar').classList.toggle('hide');
+// ------------------ Sidebar Toggle ------------------
+const hamburger = document.getElementById('hamburger');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+hamburger.onclick = () => {
+  sidebar.classList.toggle('show');
+  overlay.style.display = sidebar.classList.contains('show') ? 'block' : 'none';
+};
+overlay.onclick = () => {sidebar.classList.remove('show'); overlay.style.display='none';};
+
+// ------------------ Disclaimer ------------------
 document.getElementById('disclaimer-btn').onclick = () => document.getElementById('disclaimer').style.display='none';
 
-// Guest Login
+// ------------------ Guest Login ------------------
 function initGuest(){
   let name=sessionStorage.getItem('guestName');
-  if(!name){name=prompt("Enter your name to start:","Guest User")||"Guest User";sessionStorage.setItem('guestName',name);}
+  if(!name){name=prompt("Enter your name to start:","Guest User")||"Guest User"; sessionStorage.setItem('guestName',name);}
   document.getElementById('welcome').textContent="Welcome, "+name+"!";
   document.getElementById('card-name').textContent=name;
   document.getElementById('logout-btn').style.display='inline-block';
 }
 initGuest();
-
 function logout(){sessionStorage.removeItem('guestName'); location.reload();}
 
-// Show Section
+// ------------------ Show Section ------------------
 function showSection(id){
   document.querySelectorAll('.generator').forEach(g=>g.style.display='none');
   document.getElementById(id).style.display='block';
+  sidebar.classList.remove('show'); overlay.style.display='none';
 }
 showSection('dashboard');
 
-// Dummy Generators
+// ------------------ Dummy Generators ------------------
 function generateCaption(){
   const topic=document.getElementById('caption-topic').value||'Food';
-  document.getElementById('caption-output').innerHTML=`<p>"Delicious vibes only! 🍴 #${topic}" <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
+  document.getElementById('caption-output').innerHTML=`
+    <p>"Delicious vibes only! 🍴 #${topic}" <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
 }
 function generateMeme(){
   document.getElementById('meme-output').innerHTML=`<p>When you realize weekend is over 😭 <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
@@ -265,21 +278,21 @@ function generateBio(){
   document.getElementById('bio-output').innerHTML=`<p>Software Tester | Coffee Lover ☕ <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
 }
 function generatePost(){
-  const desc=document.getElementById('post-desc').value;
+  const desc=document.getElementById('post-desc').value||'Life moments';
   const lang=document.getElementById('post-lang').value;
-  document.getElementById('post-output').innerHTML=`<p>${lang} Post: Sharing thoughts on "${desc}" 💬 <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
+  document.getElementById('post-output').innerHTML=`<p>${lang} Post: "${desc}" 💬 <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
 }
 function generateVideo(){
-  const url=document.getElementById('video-url').value;
+  const url=document.getElementById('video-url').value||'#';
   document.getElementById('video-output').innerHTML=`<p>Download ready: <a href="${url}" target="_blank">${url}</a></p>`;
 }
 function generateTranslate(){
-  const text=document.getElementById('translate-text').value;
+  const text=document.getElementById('translate-text').value||'Hello';
   const lang=document.getElementById('translate-lang').value;
   document.getElementById('translate-output').innerHTML=`<p>Translated to ${lang}: "${text}" (demo)</p>`;
 }
 function searchProfile(){
-  const name=document.getElementById('profile-name').value;
+  const name=document.getElementById('profile-name').value||'guest';
   document.getElementById('profile-output').innerHTML=`
     <p>Instagram: <a href='https://instagram.com/${name}' target='_blank'>@${name}</a></p>
     <p>Twitter: <a href='https://twitter.com/${name}' target='_blank'>@${name}</a></p>
@@ -287,15 +300,15 @@ function searchProfile(){
     <p>YouTube: <a href='https://youtube.com/@${name}' target='_blank'>@${name}</a></p>`;
 }
 
-// Copy Button
+// ------------------ Copy Text ------------------
 function copyText(btn){
-  const text=btn.parentElement.textContent.trim();
+  const text=btn.parentElement.textContent.replace('Copy','').trim();
   navigator.clipboard.writeText(text);
   btn.textContent="Copied!";
   setTimeout(()=>btn.textContent="Copy",2000);
 }
 
-// Dashboard analytics
+// ------------------ Dashboard Analytics ------------------
 function randomize(){
   document.getElementById('followers').textContent=Math.floor(Math.random()*5000+1000);
   document.getElementById('engagement').textContent=(Math.random()*10).toFixed(2)+"%";
@@ -303,14 +316,14 @@ function randomize(){
 }
 randomize();
 
-// Trending Section
+// ------------------ Trending ------------------
 function loadTrending(){
   const platforms=["Instagram","Twitter","YouTube","LinkedIn"];
   const samplePosts=[
     "Exploring hidden gems around the world 🌍",
     "AI is transforming how we create and share ideas 🤖",
     "Dance Challenge hits 10M views in 3 days! 💃",
-    "Remote jobs are evolving — 2025 trends you must see 💼",
+    "Remote jobs are evolving — 2025 trends 💼",
     "Street food diaries from Bengaluru 🍲",
     "Photography hacks to get viral shots 📸"
   ];
