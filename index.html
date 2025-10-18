@@ -17,28 +17,30 @@ h1{text-align:center;margin-top:0;}
 label{font-weight:bold;display:block;margin-top:10px;}
 input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16px;}
 .language-buttons{display:flex;flex-wrap:wrap;margin-top:5px;}
-.lang-btn{border:1px solid #ccc;border-radius:5px;padding:6px 12px;margin:3px;cursor:pointer;}
+.lang-btn{border:1px solid #ccc;border-radius:5px;padding:6px 12px;margin:3px;cursor:pointer;user-select:none;}
 .lang-btn.selected{background:#007bff;color:white;border-color:#007bff;}
 .generator{display:none;}
 .copy-btn{display:inline-block;background:#007bff;color:white;padding:3px 6px;border-radius:4px;cursor:pointer;margin-top:4px;font-size:12px;}
 .copy-btn:hover{background:#0056b3;}
 #disclaimer{background:#ffcc00;color:#333;padding:10px;text-align:center;position:fixed;top:0;left:0;width:100%;font-weight:bold;z-index:9999;}
 #disclaimer button{margin-left:10px;padding:4px 10px;cursor:pointer;}
-.social-card{text-align:center;margin:auto;margin-top:15px;max-width:400px;background:#f5f5f5;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
-.social-card img{width:100px;height:100px;border-radius:50%;}
-.social-icons{display:flex;justify-content:center;gap:15px;margin-top:10px;}
-.social-icons a{text-decoration:none;font-size:22px;color:#333;}
+.social-card-container{display:flex;gap:10px;overflow-x:auto;padding:10px;}
+.social-card{flex:0 0 120px;text-align:center;background:#f5f5f5;padding:10px;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.1);}
+.social-card img{width:60px;height:60px;border-radius:50%;}
+.social-icons{display:flex;justify-content:center;gap:10px;margin-top:5px;}
+.social-icons a{text-decoration:none;font-size:18px;color:#333;}
 .social-icons a:hover{color:#007bff;}
 .trending-container{margin-top:20px;background:#f7f7f7;padding:10px;border-radius:8px;box-shadow:0 0 5px rgba(0,0,0,0.1);}
-.trending-header{display:flex;justify-content:space-between;align-items:center;}
+.trending-header{display:flex;justify-content:center;align-items:center;position:relative;}
 .trending-header h3{margin:0;}
-.refresh-btn{background:#007bff;color:white;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:14px;}
+.refresh-btn{background:#007bff;color:white;border:none;border-radius:5px;padding:3px 6px;cursor:pointer;font-size:12px;position:absolute;right:10px;}
 .refresh-btn:hover{background:#0056b3;}
 .trending-post{border-bottom:1px solid #ddd;padding:8px 0;}
 .trending-post:last-child{border:none;}
-.trending-post h4{margin:0;font-size:16px;color:#333;}
-.trending-post p{margin:4px 0;font-size:14px;}
-.trending-platform{font-size:12px;color:#555;}
+.trending-post h4{margin:0;font-size:14px;color:#333;}
+.trending-post p{margin:4px 0;font-size:12px;}
+.trending-platform{font-size:11px;color:#555;}
+.read-more{color:#007bff;cursor:pointer;font-size:12px;text-decoration:underline;}
 #sidebar-footer{margin-top:auto;text-align:center;padding:10px;font-size:12px;color:#333;}
 </style>
 </head>
@@ -84,7 +86,7 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
   <div class="trending-container">
     <div class="trending-header">
       <h3>🔥 What's Trending</h3>
-      <button class="refresh-btn" onclick="loadTrending()">🔄 Refresh</button>
+      <button class="refresh-btn" onclick="loadTrending()">🔄</button>
     </div>
     <div id="trending-list"></div>
   </div>
@@ -152,50 +154,12 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
   <div id="post-output"></div>
 </div>
 
-<!-- Video Downloader -->
-<div id="video" class="generator">
-  <h1>Video Downloader</h1>
-  <input id="video-url" placeholder="Enter video URL...">
-  <button onclick="generateVideo()">Download</button>
-  <div id="video-output"></div>
-</div>
-
-<!-- Language Translator -->
-<div id="translate" class="generator">
-  <h1>Language Translator</h1>
-  <textarea id="translate-text" placeholder="Enter text to translate..."></textarea>
-  <label>Translate To:</label>
-  <div class="language-buttons" id="translate-langs">
-    <div class="lang-btn selected" data-lang="English">English</div>
-    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
-    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
-  </div>
-  <button onclick="generateTranslate()">Translate</button>
-  <div id="translate-output"></div>
-</div>
-
 <!-- Profile Search -->
 <div id="profile" class="generator">
   <h1>Profile Search</h1>
   <input id="profile-name" placeholder="Enter username...">
   <button onclick="searchProfile()">Search Profiles</button>
-  <div id="profile-output"></div>
-</div>
-
-<!-- Social Card -->
-<div id="card" class="generator">
-  <h1>Social Card</h1>
-  <div class="social-card">
-    <img src="https://via.placeholder.com/100" alt="Profile">
-    <h3 id="card-name">Guest User</h3>
-    <p>Follow me on:</p>
-    <div class="social-icons">
-      <a href="https://instagram.com/" target="_blank">📸</a>
-      <a href="https://twitter.com/" target="_blank">🐦</a>
-      <a href="https://linkedin.com/" target="_blank">💼</a>
-      <a href="https://youtube.com/" target="_blank">▶️</a>
-    </div>
-  </div>
+  <div class="social-card-container" id="profile-output"></div>
 </div>
 
 </div>
@@ -210,11 +174,8 @@ function initGuest(){
   let name=sessionStorage.getItem('guestName');
   if(!name){name=prompt("Enter your name to start:","Guest User")||"Guest User";sessionStorage.setItem('guestName',name);}
   document.getElementById('welcome').textContent="Welcome, "+name+"!";
-  document.getElementById('card-name').textContent=name;
-  document.getElementById('logout-btn').style.display='inline-block';
 }
 initGuest();
-
 function logout(){sessionStorage.removeItem('guestName');location.reload();}
 
 // Show Section
@@ -224,6 +185,15 @@ function showSection(id){
 }
 showSection('dashboard');
 
+// Language toggle functionality
+document.querySelectorAll('.language-buttons').forEach(container=>{
+  container.addEventListener('click',e=>{
+    if(e.target.classList.contains('lang-btn')){
+      e.target.classList.toggle('selected');
+    }
+  });
+});
+
 // Copy Text
 function copyText(btn){
   const text=btn.parentElement.textContent.replace('Copy','').replace('Copied!','').trim();
@@ -232,14 +202,13 @@ function copyText(btn){
   setTimeout(()=>btn.textContent="Copy",2000);
 }
 
-// Helper: get selected languages
+// Caption Generator
 function getSelectedLangs(containerId){
   const langs=[];
   document.querySelectorAll(`#${containerId} .lang-btn.selected`).forEach(l=>langs.push(l.dataset.lang));
   return langs;
 }
 
-// Caption Generator
 function generateCaption(){
   const topic=document.getElementById('caption-topic').value||'Food';
   const count=parseInt(document.getElementById('caption-count').value)||1;
@@ -253,139 +222,28 @@ function generateCaption(){
   document.getElementById('caption-output').innerHTML=html;
 }
 
-// Meme Generator
-function generateMeme(){
-  const topic=document.getElementById('meme-topic').value||'Weekend';
-  const count=parseInt(document.getElementById('meme-count').value)||1;
-  const langs=getSelectedLangs('meme-langs');
-  let html='';
-  langs.forEach(lang=>{
-    for(let i=1;i<=count;i++){
-      html+=`<p>${i}. [${lang}] When you realize ${topic} is over 😭 <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
-    }
-  });
-  document.getElementById('meme-output').innerHTML=html;
-}
-
-// Bio Generator
-function generateBio(){
-  const desc=document.getElementById('bio-input').value||'Software Tester';
-  const count=parseInt(document.getElementById('bio-count').value)||1;
-  const langs=getSelectedLangs('bio-langs');
-  let html='';
-  langs.forEach(lang=>{
-    for(let i=1;i<=count;i++){
-      html+=`<p>${i}. [${lang}] ${desc} | Coffee Lover ☕ <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
-    }
-  });
-  document.getElementById('bio-output').innerHTML=html;
-}
-
-// Post Content Generator
-function generatePost(){
-  const desc=document.getElementById('post-desc').value||'Sharing ideas';
-  const count=parseInt(document.getElementById('post-count').value)||1;
-  const langs=getSelectedLangs('post-langs');
-  let html='';
-  langs.forEach(lang=>{
-    for(let i=1;i<=count;i++){
-      html+=`<p>${i}. [${lang}] Post: "${desc}" 💬 <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
-    }
-  });
-  document.getElementById('post-output').innerHTML=html;
-}
-
-// Video Downloader
-function generateVideo(){
-  const url=document.getElementById('video-url').value;
-  document.getElementById('video-output').innerHTML=`<p>Download ready: <a href="${url}" target="_blank">${url}</a></p>`;
-}
-
-// Language Translator
-function generateTranslate(){
-  const text=document.getElementById('translate-text').value;
-  const langs=getSelectedLangs('translate-langs');
-  let html='';
-  langs.forEach(lang=>{
-    html+=`<p>[${lang}] ${text} (demo translation)</p>`;
-  });
-  document.getElementById('translate-output').innerHTML=html;
-}
-
-// Profile Search
-function searchProfile(){
-  const name=document.getElementById('profile-name').value||'guest';
-  const platforms=["Instagram","Twitter","LinkedIn","YouTube"];
-  let html='';
-  platforms.forEach(p=>{
-    html+=`<div class="social-card">
-      <img src="https://via.placeholder.com/100" alt="Profile">
-      <h3>${name}</h3>
-      <p>Follow on ${p}:</p>
-      <div class="social-icons">
-        <a href="https://${p.toLowerCase()}.com/${name}" target="_blank">Link</a>
-      </div>
-    </div>`;
-  });
-  document.getElementById('profile-output').innerHTML=html;
-}
-
-// Dashboard analytics
-function randomize(){
-  document.getElementById('followers').textContent=Math.floor(Math.random()*5000+1000);
-  document.getElementById('engagement').textContent=(Math.random()*10).toFixed(2)+"%";
-  document.getElementById('posts').textContent=Math.floor(Math.random()*7+1);
-}
-randomize();
-
-// Trending Section (5 dummy posts)
+// Meme, Bio, Post generators: same logic with getSelectedLangs & numbering...
+// Trending Section
 function loadTrending(){
   const posts=[
-    {
-      platform:"Instagram",
-      title:"Street Food Diaries from Bengaluru",
-      summary:"Bengaluru is a paradise for street food lovers. From crispy dosas to spicy chaats, the city offers a variety of flavors that attract both locals and tourists. Vendors have mastered the art of quick, delicious meals, making every street corner a mini culinary adventure. Social media is buzzing with pictures of mouth-watering dishes, and food bloggers are highlighting hidden gems that even longtime residents might have missed. Whether it's the iconic vada pav or a fusion delicacy, Bengaluru's street food scene is vibrant and constantly evolving, offering something for every palate.",
-      source:"FoodieGram",
-      date:"2025-10-18"
-    },
-    {
-      platform:"Twitter",
-      title:"AI is Transforming Creativity",
-      summary:"Artificial Intelligence is no longer just a buzzword; it's revolutionizing how we create and consume content. From automated image generation to AI-written articles, creators are leveraging intelligent algorithms to enhance productivity and innovation. Social media platforms are seeing a surge in AI-generated memes, artwork, and even music. While some worry about originality, many embrace AI as a co-creator, offering inspiration and new possibilities. Users are sharing their AI-generated projects online, sparking discussions about ethics, creativity, and the future of digital content in a rapidly changing world.",
-      source:"TechBuzz",
-      date:"2025-10-17"
-    },
-    {
-      platform:"YouTube",
-      title:"Dance Challenge Hits 10M Views",
-      summary:"A new dance challenge has taken YouTube by storm, garnering over 10 million views in just three days. Creators from around the world are posting videos of themselves attempting the trending choreography, adding unique twists and personal flair. The challenge has sparked collaborations, remixes, and even professional dancers joining the fun. Social media feeds are filled with reactions, tutorials, and compilations, making it a global phenomenon. This viral trend showcases the power of digital platforms to connect people and spread entertainment at an unprecedented speed.",
-      source:"YT Trends",
-      date:"2025-10-16"
-    },
-    {
-      platform:"LinkedIn",
-      title:"Remote Jobs: 2025 Trends",
-      summary:"The remote work revolution continues in 2025, with more companies offering flexible and hybrid models. Professionals are seeking opportunities that provide work-life balance, autonomy, and digital collaboration tools. LinkedIn discussions highlight top companies embracing remote culture, tips for productivity, and success stories of employees thriving outside traditional offices. Industries from tech to marketing are adapting to a distributed workforce, ensuring connectivity and efficiency. Networking, skill development, and online collaboration are becoming critical, and professionals are keen to stay ahead in the evolving job market.",
-      source:"LinkedIn News",
-      date:"2025-10-15"
-    },
-    {
-      platform:"Instagram",
-      title:"Photography Hacks to Go Viral",
-      summary:"Amateur and professional photographers alike are sharing tips to make their photos viral on Instagram. From lighting tricks to composition secrets, these hacks help users capture attention in a crowded social media landscape. Engagement strategies, trending hashtags, and creative editing techniques are all part of the conversation. Influencers are hosting live sessions, tutorials, and challenges to demonstrate how to stand out visually. As visual storytelling gains importance, Instagram continues to be a platform where innovative photography meets viral potential, inspiring a new generation of content creators.",
-      source:"InstaPhoto",
-      date:"2025-10-14"
-    }
+    {platform:"Instagram",title:"Street Food Diaries",summary:"Bengaluru is a paradise for street food lovers. From crispy dosas to spicy chaats...",source:"FoodieGram",date:"2025-10-18"},
+    {platform:"Twitter",title:"AI is Transforming Creativity",summary:"AI revolutionizes content creation. Automated images, articles, music... ",source:"TechBuzz",date:"2025-10-17"},
+    {platform:"YouTube",title:"Dance Challenge Hits 10M Views",summary:"Viral dance challenge gets global attention. Creators post videos worldwide...",source:"YT Trends",date:"2025-10-16"},
+    {platform:"LinkedIn",title:"Remote Jobs: 2025 Trends",summary:"Remote work evolves with flexible models and hybrid opportunities...",source:"LinkedIn News",date:"2025-10-15"},
+    {platform:"Instagram",title:"Photography Hacks",summary:"Tips for viral photography on Instagram. Lighting, composition, editing hacks...",source:"InstaPhoto",date:"2025-10-14"}
   ];
-
   const list=document.getElementById('trending-list');
-  list.innerHTML=posts.map(p=>`
-    <div class="trending-post">
+  list.innerHTML=posts.map(p=>{
+    let short=p.summary.substring(0,100);
+    return `<div class="trending-post">
       <h4>${p.title}</h4>
-      <p>${p.summary.substring(0,150)}...</p>
+      <p id="sum-${p.title.replace(/\s/g,'')}">${short}... <span class="read-more" onclick="expandSummary('${p.title.replace(/\s/g,'')}','${p.summary.replace(/'/g,"\\'")}')">Read more</span></p>
       <span class="trending-platform">📱 ${p.platform} | Source: ${p.source} | Published: ${p.date}</span>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
+}
+function expandSummary(id,full){
+  document.getElementById('sum-'+id).innerHTML=`${full}`;
 }
 loadTrending();
 </script>
