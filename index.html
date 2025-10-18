@@ -1,397 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Sign in with Google — Social Media Buddy</title>
+<meta charset="UTF-8">
+<title>Social Media Buddy</title>
 <style>
-  :root{
-    --bg:#f3f6fb;
-    --card:#ffffff;
-    --muted:#6b7280;
-    --accent:#1a73e8;
-    --green:#0f9d58;
-    --shadow: 0 8px 24px rgba(18, 26, 33, 0.08);
-    --glass: rgba(255,255,255,0.6);
-    --danger:#d93025;
-  }
-  html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,"Helvetica Neue",Arial;}
-  body{background:linear-gradient(180deg,#eef2fb 0%, #f7fbff 100%);display:flex;align-items:center;justify-content:center;padding:24px;}
-  .wrap{width:100%;max-width:980px;display:grid;grid-template-columns: 1fr 420px; gap:28px;align-items:center;}
-  .panel{
-    background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.9));
-    border-radius:14px;padding:28px;box-shadow:var(--shadow);backdrop-filter: blur(6px);
-  }
-
-  .left {
-    padding:34px;
-  }
-  .brand { display:flex;align-items:center;gap:12px;margin-bottom:18px;}
-  .logo { width:48px;height:48px;border-radius:10px;background:linear-gradient(45deg,#1a73e8,#34a853);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;box-shadow: 0 6px 16px rgba(26,115,232,0.14); }
-  .h1 { font-size:20px;margin:0 0 6px 0; color:#0f172a; }
-  .lead { margin:0;color:var(--muted); font-size:14px; line-height:1.45; }
-  .features { display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;}
-  .chip { background:#f1f5f9;padding:8px 12px;border-radius:999px;font-size:13px;color:#334155; }
-
-  .right {
-    width:100%;
-  }
-  .card {
-    background:var(--card);border-radius:12px;padding:20px;box-shadow: 0 6px 18px rgba(12,28,63,0.06);
-  }
-  .title { font-size:18px;margin:4px 0 14px 0;color:#0f172a; }
-  .sub { color:var(--muted); font-size:13px;margin-bottom:14px; }
-
-  .google-btn {
-    display:flex;align-items:center;gap:12px;border-radius:8px;padding:10px 14px;border:1px solid rgba(0,0,0,0.06);cursor:pointer;background:#fff;box-shadow: 0 2px 6px rgba(11,22,60,0.04);
-    transition:transform .12s ease, box-shadow .12s;
-  }
-  .google-btn:hover{ transform:translateY(-2px); box-shadow: 0 10px 26px rgba(11,22,60,0.08);}
-  .google-mark{width:20px;height:20px;background:none;}
-  .google-label{font-weight:600;color:#202124;}
-
-  .demo-btn{display:inline-block;margin-top:12px;padding:8px 10px;border-radius:8px;background:#f1f5f9;color:#0f172a;border:1px solid rgba(15,23,42,0.04);cursor:pointer;}
-  .danger { background:var(--danger); color:#fff; padding:8px 10px;border-radius:8px;border:none;cursor:pointer;margin-left:8px; }
-
-  .meta { margin-top:14px;font-size:13px;color:var(--muted); }
-  .info { margin-top:12px;padding:10px;border-radius:8px;background:#f8fafc;font-size:13px;color:#334155; }
-  .kv { display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap; }
-  .small { font-size:12px;color:var(--muted); }
-
-  .token-card{margin-top:12px;padding:12px;border-radius:8px;background:#0f172a;color:#fff; font-size:13px; word-break:break-all;}
-
-  /* responsive */
-  @media (max-width:920px){ .wrap{grid-template-columns:1fr; } .left{order:2} .right{order:1} .card{margin-top:10px} }
+body {margin:0;font-family:Arial;}
+#sidebar {position:fixed;left:0;top:0;width:200px;height:100%;background:#333;color:white;display:flex;flex-direction:column;z-index:2;transition:0.3s;}
+#sidebar.hide{left:-200px;}
+#sidebar h2{text-align:center;padding:10px;}
+#sidebar button{background:none;border:none;color:white;text-align:left;padding:10px;cursor:pointer;font-size:16px;}
+#sidebar button:hover{background:#444;}
+#content{margin-left:200px;padding:20px;transition:0.3s;}
+#sidebar.hide + #content{margin-left:0;}
+#hamburger{position:fixed;top:10px;left:10px;font-size:26px;color:green;cursor:pointer;z-index:3;}
+h1{text-align:center;}
+label{font-weight:bold;display:block;margin-top:10px;}
+input,textarea,button{width:100%;padding:8px;margin-top:5px;font-size:16px;}
+.language-buttons{display:flex;flex-wrap:wrap;}
+.lang-btn{border:1px solid #ccc;border-radius:5px;padding:6px 12px;margin:3px;cursor:pointer;}
+.lang-btn.selected{background:#007bff;color:white;border-color:#007bff;}
+.generator{display:none;}
+.copy-btn{display:inline-block;background:#007bff;color:white;padding:3px 6px;border-radius:4px;cursor:pointer;margin-top:4px;font-size:12px;}
+.copy-btn:hover{background:#0056b3;}
+#disclaimer{background:#ffcc00;color:#333;padding:10px;text-align:center;position:fixed;top:0;left:0;width:100%;font-weight:bold;z-index:9999;}
+#disclaimer button{margin-left:10px;padding:4px 10px;cursor:pointer;}
+.social-card{text-align:center;margin:auto;margin-top:30px;max-width:400px;background:#f5f5f5;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
+.social-card img{width:100px;height:100px;border-radius:50%;}
+.social-icons{display:flex;justify-content:center;gap:15px;margin-top:10px;}
+.social-icons a{text-decoration:none;font-size:22px;color:#333;}
+.social-icons a:hover{color:#007bff;}
+.trending-container{margin-top:20px;background:#f7f7f7;padding:10px;border-radius:8px;box-shadow:0 0 5px rgba(0,0,0,0.1);}
+.trending-header{display:flex;justify-content:space-between;align-items:center;}
+.trending-header h3{margin:0;}
+.refresh-btn{background:#007bff;color:white;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:14px;}
+.refresh-btn:hover{background:#0056b3;}
+.trending-post{border-bottom:1px solid #ddd;padding:8px 0;}
+.trending-post:last-child{border:none;}
+.trending-post h4{margin:0;font-size:16px;color:#333;}
+.trending-post p{margin:4px 0;font-size:14px;}
+.trending-platform{font-size:12px;color:#555;}
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <div class="panel left">
-    <div class="brand">
-      <div class="logo">SM</div>
-      <div>
-        <div style="font-weight:700;font-size:16px">Social Media Buddy</div>
-        <div class="small">Single sign-on via Google (demo)</div>
-      </div>
-    </div>
+<!-- Disclaimer -->
+<div id="disclaimer">
+⚠️ Demo app — content is for reference only.
+<button id="disclaimer-btn">OKAY</button>
+</div>
 
-    <h2 class="h1">Sign in quickly and securely</h2>
-    <p class="lead">Use your Google account to authenticate. This page implements OAuth2 Authorization Code flow with PKCE — secure for single-page apps. Replace CLIENT_ID and REDIRECT_URI in the script section with values from Google Cloud Console.</p>
+<div id="hamburger">☰</div>
 
-    <div class="features">
-      <div class="chip">PKCE</div>
-      <div class="chip">OpenID Connect</div>
-      <div class="chip">ID token</div>
-      <div class="chip">sessionStorage</div>
-    </div>
+<!-- Sidebar -->
+<div id="sidebar">
+  <h2>Social Media Buddy</h2>
+  <button onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('caption')">Caption Generator</button>
+  <button onclick="showSection('meme')">Meme Generator</button>
+  <button onclick="showSection('bio')">Bio Generator</button>
+  <button onclick="showSection('post')">Post Content Generator</button>
+  <button onclick="showSection('video')">Video Downloader</button>
+  <button onclick="showSection('translate')">Language Translator</button>
+  <button onclick="showSection('profile')">Profile Search</button>
+  <button onclick="showSection('card')">Social Card</button>
+</div>
 
-    <div class="info">
-      <div><strong>Setup notes</strong></div>
-      <div class="kv"><div class="small">1.</div><div class="small">Register an OAuth Client (Web app) in Google Cloud Console and add the redirect URI you will use (file URL or hosted domain).</div></div>
-      <div class="kv"><div class="small">2.</div><div class="small">Set the <code>CLIENT_ID</code> and <code>REDIRECT_URI</code> values inside the script block below.</div></div>
-      <div class="kv"><div class="small">3.</div><div class="small">This page includes a demo fallback if you haven't set a client id yet.</div></div>
+<!-- Main Content -->
+<div id="content">
+
+<!-- Dashboard -->
+<div id="dashboard" class="generator">
+  <h1>Dashboard</h1>
+  <p id="welcome"></p>
+  <button onclick="logout()" id="logout-btn" style="display:none;">Logout</button>
+  <h3>Analytics Overview</h3>
+  <p><b>Followers:</b> <span id="followers">0</span></p>
+  <p><b>Engagement Rate:</b> <span id="engagement">0%</span></p>
+  <p><b>Posts This Week:</b> <span id="posts">0</span></p>
+
+  <!-- 🔥 What's Trending Section -->
+  <div class="trending-container">
+    <div class="trending-header">
+      <h3>🔥 What's Trending</h3>
+      <button class="refresh-btn" onclick="loadTrending()">🔄 Refresh</button>
     </div>
+    <div id="trending-list"></div>
   </div>
+</div>
 
-  <div class="panel right">
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div class="title">Sign in with Google</div>
-          <div class="sub">Use your Google account to continue to Social Media Buddy</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:13px;color:var(--muted)">Secure</div>
-          <div style="font-size:12px;color:var(--muted)">No password stored</div>
-        </div>
-      </div>
+<!-- Caption Generator -->
+<div id="caption" class="generator">
+  <h1>Caption Generator</h1>
+  <input id="caption-topic" placeholder="Enter topic like Food, Travel...">
+  <label>Select Languages:</label>
+  <div class="language-buttons" id="caption-langs">
+    <div class="lang-btn selected" data-lang="English">English</div>
+    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
+    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
+  </div>
+  <button onclick="generateCaption()">Generate Captions</button>
+  <div id="caption-output"></div>
+</div>
 
-      <div style="margin-top:8px">
-        <!-- Real Google button -->
-        <div id="googleSign" class="google-btn" title="Sign in with Google">
-          <svg class="google-mark" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg"><path fill="#4285f4" d="M533.5 278.4c0-18.7-1.6-37.1-4.8-54.7H272v103.5h146.9c-6.4 34.5-25.1 63.7-53.7 83.3v68h86.7c50.7-46.7 82.6-115.6 82.6-199.9z"/><path fill="#34a853" d="M272 544.3c72.8 0 133.9-24.1 178.5-65.6l-86.7-68c-24.1 16.2-54.8 25.7-91.8 25.7-70.6 0-130.5-47.6-152-111.6h-90.1v69.9C70.5 480 164.9 544.3 272 544.3z"/><path fill="#fbbc04" d="M120 329.1c-10.7-31.8-10.7-66.1 0-97.9V161.3h-90.1C7.1 205.7 0 239.9 0 278.4s7.1 72.6 29.9 117.1L120 329.1z"/><path fill="#ea4335" d="M272 109.6c39.5 0 75 13.6 103 40.4l77.2-77.2C405.9 25.3 344.8 0 272 0 164.9 0 70.5 64.3 29.9 161.3l90.1 69.9C141.5 157.2 201.4 109.6 272 109.6z"/></svg>
-          <div>
-            <div class="google-label">Sign in with Google</div>
-            <div style="font-size:12px;color:var(--muted)">Use your Google account</div>
-          </div>
-        </div>
+<!-- Meme Generator -->
+<div id="meme" class="generator">
+  <h1>Meme Generator</h1>
+  <input id="meme-topic" placeholder="Enter meme idea...">
+  <button onclick="generateMeme()">Generate Meme</button>
+  <div id="meme-output"></div>
+</div>
 
-        <!-- Demo fallback -->
-        <button id="demoSign" class="demo-btn" title="Demo sign in">Sign in (Demo)</button>
-        <button id="logout" class="danger" style="display:none">Sign out</button>
+<!-- Bio Generator -->
+<div id="bio" class="generator">
+  <h1>Bio Generator</h1>
+  <textarea id="bio-input" placeholder="Enter your profession or vibe..."></textarea>
+  <button onclick="generateBio()">Generate Bios</button>
+  <div id="bio-output"></div>
+</div>
 
-        <div class="meta" id="statusMsg" style="display:block;margin-top:12px;color:var(--muted)">Not signed in</div>
+<!-- Post Content Generator -->
+<div id="post" class="generator">
+  <h1>Post Content Generator</h1>
+  <textarea id="post-desc" placeholder="Describe your post idea..."></textarea>
+  <label>Choose Language:</label>
+  <select id="post-lang">
+    <option>English</option>
+    <option>Hindi</option>
+    <option>Kannada</option>
+  </select>
+  <button onclick="generatePost()">Generate Post</button>
+  <div id="post-output"></div>
+</div>
 
-        <!-- token / id info -->
-        <div id="tokenInfo" style="display:none">
-          <div style="margin-top:12px;font-weight:700">Signed in</div>
-          <div id="idDetails" class="token-card"></div>
-        </div>
-      </div>
+<!-- Video Downloader -->
+<div id="video" class="generator">
+  <h1>Video Downloader</h1>
+  <input id="video-url" placeholder="Enter video URL...">
+  <button onclick="generateVideo()">Download</button>
+  <div id="video-output"></div>
+</div>
 
+<!-- Language Translator -->
+<div id="translate" class="generator">
+  <h1>Language Translator</h1>
+  <textarea id="translate-text" placeholder="Enter text to translate..."></textarea>
+  <label>Translate To:</label>
+  <select id="translate-lang">
+    <option>English</option>
+    <option>Hindi</option>
+    <option>Kannada</option>
+  </select>
+  <button onclick="generateTranslate()">Translate</button>
+  <div id="translate-output"></div>
+</div>
+
+<!-- Profile Search -->
+<div id="profile" class="generator">
+  <h1>Profile Search</h1>
+  <input id="profile-name" placeholder="Enter username...">
+  <button onclick="searchProfile()">Search Profiles</button>
+  <div id="profile-output"></div>
+</div>
+
+<!-- Social Card -->
+<div id="card" class="generator">
+  <h1>Social Card</h1>
+  <div class="social-card">
+    <img src="https://via.placeholder.com/100" alt="Profile">
+    <h3 id="card-name">Guest User</h3>
+    <p>Follow me on:</p>
+    <div class="social-icons">
+      <a href="https://instagram.com/" target="_blank">📸</a>
+      <a href="https://twitter.com/" target="_blank">🐦</a>
+      <a href="https://linkedin.com/" target="_blank">💼</a>
+      <a href="https://youtube.com/" target="_blank">▶️</a>
     </div>
   </div>
 </div>
 
+</div>
+
 <script>
-/*
-  Google SSO Page (Client-side Authorization Code + PKCE)
-  IMPORTANT:
-    - Register OAuth Client in Google Cloud Console:
-      https://console.cloud.google.com/apis/credentials
-    - Create OAuth 2.0 Client ID (Web application)
-    - Add the redirect URI exactly (e.g. https://yourdomain.com/callback or http://127.0.0.1:5500/google-sso.html)
-    - Replace CLIENT_ID and REDIRECT_URI below.
+// Sidebar toggle
+document.getElementById('hamburger').onclick=()=>document.getElementById('sidebar').classList.toggle('hide');
+document.getElementById('disclaimer-btn').onclick=()=>document.getElementById('disclaimer').style.display='none';
 
-  SECURITY NOTE:
-    - This example stores tokens in sessionStorage for demo. For production, follow best practices.
-    - If you don't set CLIENT_ID, the page lets you try a demo sign-in (no Google involved).
-*/
-
-const CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"; // <-- replace
-const REDIRECT_URI = window.location.origin + window.location.pathname; // <-- set to your registered redirect URI
-const AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
-const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
-const SCOPES = "openid profile email";
-
-/* ---------- Utility helpers ---------- */
-function base64urlEncode(buffer) {
-  // base64url encode an ArrayBuffer
-  const bytes = new Uint8Array(buffer);
-  let str = "";
-  for (const charCode of bytes) str += String.fromCharCode(charCode);
-  return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+// Guest Login
+function initGuest(){
+  let name=sessionStorage.getItem('guestName');
+  if(!name){name=prompt("Enter your name to start:","Guest User")||"Guest User";sessionStorage.setItem('guestName',name);}
+  document.getElementById('welcome').textContent="Welcome, "+name+"!";
+  document.getElementById('card-name').textContent=name;
+  document.getElementById('logout-btn').style.display='inline-block';
 }
-async function sha256(plain) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(plain);
-  return await crypto.subtle.digest('SHA-256', data);
+initGuest();
+
+function logout(){sessionStorage.removeItem('guestName');location.reload();}
+
+// Show Section
+function showSection(id){
+  document.querySelectorAll('.generator').forEach(g=>g.style.display='none');
+  document.getElementById(id).style.display='block';
 }
-function randomString(length=64){
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-  let out = '';
-  const arr = new Uint32Array(length);
-  crypto.getRandomValues(arr);
-  for(let i=0;i<length;i++) out += chars[arr[i] % chars.length];
-  return out;
+showSection('dashboard');
+
+// Dummy Generators
+function generateCaption(){
+  const topic=document.getElementById('caption-topic').value||'Food';
+  document.getElementById('caption-output').innerHTML=`<p>"Delicious vibes only! 🍴 #${topic}" <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
 }
-
-/* ---------- PKCE helpers ---------- */
-async function createPKCE() {
-  const code_verifier = randomString(96);
-  const hashed = await sha256(code_verifier);
-  const code_challenge = base64urlEncode(hashed);
-  return { code_verifier, code_challenge };
+function generateMeme(){
+  document.getElementById('meme-output').innerHTML=`<p>When you realize weekend is over 😭 <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
 }
-
-/* ---------- OAuth flow ---------- */
-function saveToSession(key, value){ sessionStorage.setItem(key, value); }
-function getFromSession(key){ return sessionStorage.getItem(key); }
-function clearSessionKeys(){
-  ['code_verifier','oauth_state','access_token','id_token','refresh_token','user_info'].forEach(k=>sessionStorage.removeItem(k));
+function generateBio(){
+  document.getElementById('bio-output').innerHTML=`<p>Software Tester | Coffee Lover ☕ <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
 }
-
-/* Build the authorization URL and redirect to Google */
-async function startLogin(){
-  if (!CLIENT_ID || CLIENT_ID.includes("YOUR_GOOGLE_CLIENT_ID")){
-    // demo fallback
-    return showDemoSignedIn();
-  }
-
-  const state = randomString(16);
-  const pkce = await createPKCE();
-  saveToSession('code_verifier', pkce.code_verifier);
-  saveToSession('oauth_state', state);
-
-  const params = new URLSearchParams({
-    client_id: CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
-    response_type: 'code',
-    scope: SCOPES,
-    prompt: 'select_account',
-    access_type: 'offline',
-    include_granted_scopes: 'true',
-    state,
-    code_challenge: pkce.code_challenge,
-    code_challenge_method: 'S256'
-  });
-
-  const url = AUTH_ENDPOINT + '?' + params.toString();
-  window.location.href = url;
+function generatePost(){
+  const desc=document.getElementById('post-desc').value;
+  const lang=document.getElementById('post-lang').value;
+  document.getElementById('post-output').innerHTML=`<p>${lang} Post: Sharing thoughts on "${desc}" 💬 <div class='copy-btn' onclick='copyText(this)'>Copy</div></p>`;
+}
+function generateVideo(){
+  const url=document.getElementById('video-url').value;
+  document.getElementById('video-output').innerHTML=`<p>Download ready: <a href="${url}" target="_blank">${url}</a></p>`;
+}
+function generateTranslate(){
+  const text=document.getElementById('translate-text').value;
+  const lang=document.getElementById('translate-lang').value;
+  document.getElementById('translate-output').innerHTML=`<p>Translated to ${lang}: "${text}" (demo)</p>`;
+}
+function searchProfile(){
+  const name=document.getElementById('profile-name').value;
+  document.getElementById('profile-output').innerHTML=`
+    <p>Instagram: <a href='https://instagram.com/${name}' target='_blank'>@${name}</a></p>
+    <p>Twitter: <a href='https://twitter.com/${name}' target='_blank'>@${name}</a></p>
+    <p>LinkedIn: <a href='https://linkedin.com/in/${name}' target='_blank'>@${name}</a></p>
+    <p>YouTube: <a href='https://youtube.com/@${name}' target='_blank'>@${name}</a></p>`;
 }
 
-/* After redirect, handle code exchange */
-async function handleRedirectCallback(){
-  const url = new URL(window.location.href);
-  const code = url.searchParams.get('code');
-  const state = url.searchParams.get('state');
-  const error = url.searchParams.get('error');
+// Copy Button
+function copyText(btn){
+  const text=btn.parentElement.textContent.trim();
+  navigator.clipboard.writeText(text);
+  btn.textContent="Copied!";
+  setTimeout(()=>btn.textContent="Copy",2000);
+}
 
-  if (error){
-    console.warn("Authorization error:", error);
-    updateStatus("Authorization failed: " + error, true);
-    // remove params from URL
-    history.replaceState(null, '', REDIRECT_URI);
-    return;
-  }
+// Dashboard analytics
+function randomize(){
+  document.getElementById('followers').textContent=Math.floor(Math.random()*5000+1000);
+  document.getElementById('engagement').textContent=(Math.random()*10).toFixed(2)+"%";
+  document.getElementById('posts').textContent=Math.floor(Math.random()*7+1);
+}
+randomize();
 
-  if (!code) return; // nothing to do
-
-  const expectedState = getFromSession('oauth_state');
-  if (!state || state !== expectedState){
-    updateStatus("Invalid OAuth state (possible CSRF).", true);
-    return;
-  }
-
-  const code_verifier = getFromSession('code_verifier');
-  if (!code_verifier){
-    updateStatus("Missing PKCE code verifier in session.", true);
-    return;
-  }
-
-  updateStatus("Exchanging authorization code...");
-
-  try {
-    // Exchange code for tokens
-    const body = new URLSearchParams({
-      grant_type: 'authorization_code',
-      code,
-      client_id: CLIENT_ID,
-      redirect_uri: REDIRECT_URI,
-      code_verifier
+// Trending Section
+function loadTrending(){
+  const platforms=["Instagram","Twitter","YouTube","LinkedIn"];
+  const samplePosts=[
+    "Exploring hidden gems around the world 🌍",
+    "AI is transforming how we create and share ideas 🤖",
+    "Dance Challenge hits 10M views in 3 days! 💃",
+    "Remote jobs are evolving — 2025 trends you must see 💼",
+    "Street food diaries from Bengaluru 🍲",
+    "Photography hacks to get viral shots 📸"
+  ];
+  let posts=[];
+  for(let i=0;i<4;i++){
+    posts.push({
+      platform:platforms[i],
+      title:samplePosts[Math.floor(Math.random()*samplePosts.length)],
+      text:"Trending now on "+platforms[i]+"!"
     });
-
-    const resp = await fetch(TOKEN_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/x-www-form-urlencoded' },
-      body: body.toString()
-    });
-
-    if (!resp.ok) {
-      const txt = await resp.text();
-      updateStatus("Token exchange failed: " + resp.status + " " + txt, true);
-      return;
-    }
-
-    const tokens = await resp.json();
-    // tokens: access_token, expires_in, refresh_token (maybe), id_token, token_type
-    saveToSession('access_token', tokens.access_token || '');
-    saveToSession('id_token', tokens.id_token || '');
-    if (tokens.refresh_token) saveToSession('refresh_token', tokens.refresh_token);
-
-    // parse id token (JWT) for user info (unsafe demo parse)
-    const idPayload = tokens.id_token ? JSON.parse(atob(tokens.id_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))) : null;
-    if (idPayload) saveToSession('user_info', JSON.stringify(idPayload));
-
-    updateSignedInUI();
-    // Clean URL
-    history.replaceState(null, '', REDIRECT_URI);
-  } catch (err){
-    console.error(err);
-    updateStatus("Token exchange error: " + err.message, true);
   }
+  const list=document.getElementById('trending-list');
+  list.innerHTML=posts.map(p=>`
+    <div class="trending-post">
+      <h4>${p.title}</h4>
+      <p>${p.text}</p>
+      <span class="trending-platform">📱 ${p.platform}</span>
+    </div>`).join('');
 }
-
-/* Try to fetch userinfo (optional) using access token */
-async function fetchUserInfo(){
-  const access = getFromSession('access_token');
-  if (!access) return null;
-  try {
-    const res = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
-      headers: { Authorization: 'Bearer ' + access }
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch(e){ return null; }
-}
-
-/* Sign out / revoke */
-async function signOut(){
-  const access = getFromSession('access_token');
-  clearSessionKeys();
-  updateStatus("Signed out.");
-  updateSignedOutUI();
-  if (access){
-    // try revoke (best-effort)
-    try {
-      await fetch('https://oauth2.googleapis.com/revoke?token=' + encodeURIComponent(access), { method: 'POST' });
-    } catch(e){}
-  }
-}
-
-/* ---------- UI helpers ---------- */
-const statusEl = document.getElementById('statusMsg');
-const tokenInfoEl = document.getElementById('tokenInfo');
-const idDetailsEl = document.getElementById('idDetails');
-const googleSignBtn = document.getElementById('googleSign');
-const demoBtn = document.getElementById('demoSign');
-const logoutBtn = document.getElementById('logout');
-
-function updateStatus(message, isError=false){
-  statusEl.style.color = isError ? 'var(--danger)' : 'var(--muted)';
-  statusEl.textContent = message;
-}
-
-function showDemoSignedIn(){
-  const demoUser = { name: 'Demo User', email:'demo@example.com', picture:'' };
-  saveToSession('user_info', JSON.stringify(demoUser));
-  saveToSession('access_token','demo-token');
-  saveToSession('id_token','demo-id-token');
-  updateSignedInUI();
-}
-
-async function updateSignedInUI(){
-  const userRaw = getFromSession('user_info');
-  let user = null;
-  if (userRaw) {
-    try { user = JSON.parse(userRaw); } catch(e){ user = null; }
-  } else {
-    // attempt to fetch userinfo via API
-    const fetched = await fetchUserInfo();
-    if (fetched) { user = fetched; saveToSession('user_info', JSON.stringify(user)); }
-  }
-
-  if (!user){
-    updateStatus("Signed in but user info not available.");
-    tokenInfoEl.style.display = 'none';
-    logoutBtn.style.display = 'inline-block';
-    return;
-  }
-
-  // show UI
-  updateStatus("Signed in as " + (user.name || user.email));
-  tokenInfoEl.style.display = 'block';
-  logoutBtn.style.display = 'inline-block';
-  // show id token / user info
-  idDetailsEl.textContent = JSON.stringify(user, null, 2);
-}
-
-function updateSignedOutUI(){
-  tokenInfoEl.style.display = 'none';
-  logoutBtn.style.display = 'none';
-  updateStatus("Not signed in");
-  clearSessionKeys();
-}
-
-/* ---------- Event wiring ---------- */
-googleSignBtn.addEventListener('click', startLogin);
-demoBtn.addEventListener('click', showDemoSignedIn);
-logoutBtn.addEventListener('click', signOut);
-
-/* On page load, if redirected from Google with a code — handle it */
-handleRedirectCallback().then(async ()=>{
-  // if we have tokens in session, update UI
-  if (getFromSession('id_token') || getFromSession('access_token')){
-    await updateSignedInUI();
-  } else {
-    updateSignedOutUI();
-  }
-});
-
-/* For convenience: show token info if present */
-if (getFromSession('id_token')) updateSignedInUI();
-
+loadTrending();
 </script>
 </body>
 </html>
