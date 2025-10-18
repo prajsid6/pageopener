@@ -85,7 +85,6 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
     <div class="card-small"><h4>Engagement</h4><p id="engagement">0%</p></div>
     <div class="card-small"><h4>Posts This Week</h4><p id="posts">0</p></div>
   </div>
-  <!-- 🔥 Trending -->
   <div class="trending-container">
     <div class="trending-header">
       <h3>🔥 What's Trending</h3>
@@ -99,13 +98,19 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
 <div id="caption" class="generator">
   <h1>Caption Generator</h1>
   <input id="caption-topic" placeholder="Enter topic like Food, Travel...">
+  <label>Number of Captions:</label>
+  <input type="number" id="caption-count" value="3" min="1" max="10">
+  
   <label>Select Languages:</label>
   <div class="language-buttons" id="caption-langs">
     <div class="lang-btn selected" data-lang="English">English</div>
     <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
     <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
   </div>
+  
   <button onclick="generateCaption()">Generate Captions</button>
+  <button onclick="copyAllCaptions()">Copy All</button>
+  
   <div id="caption-output"></div>
 </div>
 
@@ -163,15 +168,15 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
 
 <!-- Profile Search -->
 <div id="profile" class="generator">
-  <h1>Profile Search & Accounts</h1>
+  <h1>Profile Search</h1>
   <input id="profile-name" placeholder="Enter username...">
   <button onclick="searchProfile()">Search Profiles</button>
   <div id="profile-output"></div>
   <h3>Add New Social Media Account</h3>
-  <input id="new-platform" placeholder="Platform name (Instagram/Twitter/LinkedIn)">
-  <input id="new-username" placeholder="Username or URL">
+  <input id="new-account-name" placeholder="Account Name (e.g. Instagram)">
+  <input id="new-account-url" placeholder="URL (e.g. https://instagram.com/user)">
   <button onclick="addSocialAccount()">Add Account</button>
-  <div id="user-accounts"></div>
+  <div id="added-accounts"></div>
 </div>
 
 <!-- Social Card -->
@@ -181,132 +186,135 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
     <img src="https://via.placeholder.com/100" alt="Profile">
     <h3 id="card-name">Guest User</h3>
     <p>Follow me on:</p>
-    <div class="social-icons" id="social-icons"></div>
+    <div class="social-icons" id="card-icons">
+      <a href="https://instagram.com/" target="_blank">📸</a>
+      <a href="https://twitter.com/" target="_blank">🐦</a>
+      <a href="https://linkedin.com/" target="_blank">💼</a>
+      <a href="https://youtube.com/" target="_blank">▶️</a>
+    </div>
   </div>
 </div>
 
 </div>
 
 <script>
-// ------------------ Sidebar & Disclaimer ------------------
-const sidebar = document.getElementById('sidebar');
-const hamburger = document.getElementById('hamburger');
-const overlay = document.createElement('div'); // optional overlay if needed
-hamburger.onclick = () => sidebar.classList.toggle('hide');
-document.getElementById('disclaimer-btn').onclick = () => document.getElementById('disclaimer').style.display = 'none';
+// Sidebar toggle
+document.getElementById('hamburger').onclick=()=>document.getElementById('sidebar').classList.toggle('hide');
+document.getElementById('disclaimer-btn').onclick=()=>document.getElementById('disclaimer').style.display='none';
 
-// ------------------ Guest Login ------------------
-let userAccounts = [
-  { platform: 'Instagram', username: 'guest', url: 'https://instagram.com/guest' },
-  { platform: 'Twitter', username: 'guest', url: 'https://twitter.com/guest' }
-];
+// Guest Login
 function initGuest(){
   let name=sessionStorage.getItem('guestName');
-  if(!name){name=prompt("Enter your name to start:","Guest User")||"Guest User"; sessionStorage.setItem('guestName',name);}
+  if(!name){name=prompt("Enter your name to start:","Guest User")||"Guest User";sessionStorage.setItem('guestName',name);}
   document.getElementById('welcome').textContent="Welcome, "+name+"!";
   document.getElementById('card-name').textContent=name;
   document.getElementById('logout-btn').style.display='inline-block';
-  renderUserAccounts();
 }
 initGuest();
-function logout(){sessionStorage.removeItem('guestName'); location.reload();}
+function logout(){sessionStorage.removeItem('guestName');location.reload();}
 
-// ------------------ Show Section ------------------
+// Show Section
 function showSection(id){
   document.querySelectorAll('.generator').forEach(g=>g.style.display='none');
   document.getElementById(id).style.display='block';
 }
 showSection('dashboard');
 
-// ------------------ Language Buttons ------------------
-document.querySelectorAll('.lang-btn').forEach(btn => {
-  btn.onclick = () => btn.classList.toggle('selected');
-});
-
-// ------------------ Add Social Account ------------------
-function addSocialAccount() {
-  const platform = document.getElementById('new-platform').value.trim();
-  const username = document.getElementById('new-username').value.trim();
-  if(!platform || !username) return alert('Enter both platform and username');
-  let url;
-  switch(platform.toLowerCase()){
-    case 'instagram': url=`https://instagram.com/${username}`; break;
-    case 'twitter': url=`https://twitter.com/${username}`; break;
-    case 'linkedin': url=`https://linkedin.com/in/${username}`; break;
-    default: url=username;
-  }
-  userAccounts.push({ platform, username, url });
-  renderUserAccounts();
-  document.getElementById('new-platform').value='';
-  document.getElementById('new-username').value='';
-  renderSocialIcons();
-}
-function renderUserAccounts(){
-  const container=document.getElementById('user-accounts');
-  container.innerHTML=userAccounts.map(a=>`<p>${a.platform}: <a href="${a.url}" target="_blank">@${a.username}</a></p>`).join('');
-}
-function renderSocialIcons(){
-  const container=document.getElementById('social-icons');
-  container.innerHTML=userAccounts.map(a=>`<a href="${a.url}" target="_blank">${a.platform[0]}</a>`).join('');
-}
-renderSocialIcons();
-
-// ------------------ Generators ------------------
-function generateCaption(){
-  const topic=document.getElementById('caption-topic').value||'Food';
-  const langs=Array.from(document.querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
-  let output='';
-  langs.forEach(lang=>{
-    for(let i=1;i<=3;i++){
-      output+=`<div class="generated-item"><p>${lang}: Delicious vibes #${topic} #${i}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
-    }
-  });
-  document.getElementById('caption-output').innerHTML=output;
-}
-function generateMeme(){
-  const memes=["Weekend is over 😭","When code finally works 🎉","Coffee first, bugs later ☕"];
-  let output='';
-  memes.forEach(m=>output+=`<div class="generated-item"><p>${m}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`);
-  document.getElementById('meme-output').innerHTML=output;
-}
-function generateBio(){
-  const bios=["Software Tester | Coffee Lover ☕","QA Enthusiast | Tech Explorer","Bug Hunter 🐛 | Code Tester"];
-  let output='';
-  bios.forEach(b=>output+=`<div class="generated-item"><p>${b}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`);
-  document.getElementById('bio-output').innerHTML=output;
-}
-function generatePost(){
-  const desc=document.getElementById('post-desc').value||'Life moments';
-  const lang=document.getElementById('post-lang').value;
-  let output='';
-  for(let i=1;i<=3;i++){
-    output+=`<div class="generated-item"><p>${lang} Post: "${desc}" #${i}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
-  }
-  document.getElementById('post-output').innerHTML=output;
-}
-function generateVideo(){
-  const url=document.getElementById('video-url').value||'#';
-  document.getElementById('video-output').innerHTML=`<p>Download ready: <a href="${url}" target="_blank">${url}</a></p>`;
-}
-function generateTranslate(){
-  const text=document.getElementById('translate-text').value||'Hello';
-  const lang=document.getElementById('translate-lang').value;
-  document.getElementById('translate-output').innerHTML=`<p>Translated to ${lang}: "${text}" (demo)</p>`;
-}
-function searchProfile(){
-  const name=document.getElementById('profile-name').value||'guest';
-  document.getElementById('profile-output').innerHTML=userAccounts.map(a=>`<p>${a.platform}: <a href='${a.url}' target='_blank'>@${a.username}</a></p>`).join('');
-}
-
-// ------------------ Copy Text ------------------
+// Copy Button
 function copyText(btn){
-  const text=btn.parentElement.querySelector('p').textContent;
+  const text=btn.parentElement.querySelector('p').textContent.trim();
   navigator.clipboard.writeText(text);
   btn.textContent="Copied!";
   setTimeout(()=>btn.textContent="Copy",2000);
 }
 
-// ------------------ Dashboard Analytics ------------------
+// Caption Generator
+const topicEmojis={Food:'🍴 #Foodie #Yummy',Travel:'✈️ #Wanderlust #Adventure',Fitness:'💪 #Fitness #Workout',Fashion:'👗 #Style #OOTD',Default:'🔥 #Trending #Vibes'};
+function generateCaption(){
+  const topic=document.getElementById('caption-topic').value.trim()||'Food';
+  const count=parseInt(document.getElementById('caption-count').value)||3;
+  const langs=Array.from(document.querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
+  let emoji=topicEmojis[topic]||topicEmojis['Default'];
+  let output='';
+  langs.forEach(lang=>{
+    for(let i=1;i<=count;i++){
+      output+=`<div class="generated-item">
+        <p>${lang}: ${topic} vibes #${i} ${emoji}</p>
+        <div class='copy-btn' onclick='copyText(this)'>Copy</div>
+      </div>`;
+    }
+  });
+  document.getElementById('caption-output').innerHTML=output;
+}
+function copyAllCaptions(){
+  const texts=Array.from(document.querySelectorAll('#caption-output p')).map(p=>p.textContent);
+  if(texts.length===0){alert('No captions generated');return;}
+  navigator.clipboard.writeText(texts.join('\n'));
+  alert('All captions copied!');
+}
+
+// Meme Generator
+function generateMeme(){
+  const topic=document.getElementById('meme-topic').value||'Weekend';
+  let output='';
+  for(let i=1;i<=3;i++){
+    output+=`<div class="generated-item"><p>Meme #${i}: ${topic} moments 😂</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
+  }
+  document.getElementById('meme-output').innerHTML=output;
+}
+
+// Bio Generator
+function generateBio(){
+  const input=document.getElementById('bio-input').value||'Software Tester';
+  let output='';
+  const bios=[`${input} | Coffee Lover ☕`,`${input} | AI Enthusiast 🤖`,`${input} | Traveler ✈️`];
+  bios.forEach(b=>output+=`<div class="generated-item"><p>${b}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`);
+  document.getElementById('bio-output').innerHTML=output;
+}
+
+// Post Generator
+function generatePost(){
+  const desc=document.getElementById('post-desc').value||'Sharing thoughts';
+  const lang=document.getElementById('post-lang').value;
+  let output='';
+  for(let i=1;i<=3;i++){
+    output+=`<div class="generated-item"><p>${lang} Post #${i}: ${desc}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
+  }
+  document.getElementById('post-output').innerHTML=output;
+}
+
+// Video Downloader
+function generateVideo(){
+  const url=document.getElementById('video-url').value;
+  document.getElementById('video-output').innerHTML=`<p>Download ready: <a href="${url}" target="_blank">${url}</a></p>`;
+}
+
+// Translator
+function generateTranslate(){
+  const text=document.getElementById('translate-text').value;
+  const lang=document.getElementById('translate-lang').value;
+  document.getElementById('translate-output').innerHTML=`<p>Translated to ${lang}: "${text}" (demo)</p>`;
+}
+
+// Profile Search & Add Social
+function searchProfile(){
+  const name=document.getElementById('profile-name').value;
+  document.getElementById('profile-output').innerHTML=`
+    <p>Instagram: <a href='https://instagram.com/${name}' target='_blank'>@${name}</a></p>
+    <p>Twitter: <a href='https://twitter.com/${name}' target='_blank'>@${name}</a></p>
+    <p>LinkedIn: <a href='https://linkedin.com/in/${name}' target='_blank'>@${name}</a></p>
+    <p>YouTube: <a href='https://youtube.com/@${name}' target='_blank'>@${name}</a></p>`;
+}
+function addSocialAccount(){
+  const n=document.getElementById('new-account-name').value.trim();
+  const u=document.getElementById('new-account-url').value.trim();
+  if(!n||!u){alert('Enter both name and URL');return;}
+  const div=document.createElement('div'); div.innerHTML=`<a href="${u}" target="_blank">${n}</a>`;
+  document.getElementById('added-accounts').appendChild(div);
+  document.getElementById('card-icons').innerHTML+=`<a href="${u}" target="_blank">${n[0]}</a>`;
+}
+
+// Dashboard Analytics
 function randomize(){
   document.getElementById('followers').textContent=Math.floor(Math.random()*5000+1000);
   document.getElementById('engagement').textContent=(Math.random()*10).toFixed(2)+"%";
@@ -314,14 +322,14 @@ function randomize(){
 }
 randomize();
 
-// ------------------ Trending ------------------
+// Trending
 function loadTrending(){
   const platforms=["Instagram","Twitter","YouTube","LinkedIn"];
   const samplePosts=[
     "Exploring hidden gems around the world 🌍",
     "AI is transforming how we create and share ideas 🤖",
     "Dance Challenge hits 10M views in 3 days! 💃",
-    "Remote jobs are evolving — 2025 trends 💼",
+    "Remote jobs are evolving — 2025 trends you must see 💼",
     "Street food diaries from Bengaluru 🍲",
     "Photography hacks to get viral shots 📸"
   ];
