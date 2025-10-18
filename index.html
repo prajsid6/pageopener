@@ -6,7 +6,7 @@
   <style>
     body { font-family: Arial; max-width: 900px; margin: auto; padding: 20px; }
     h1 { text-align: center; }
-    input, select, button, textarea { margin: 5px 0; padding: 8px; font-size: 16px; }
+    input, button { margin: 5px 0; padding: 8px; font-size: 16px; }
     .language-buttons { display: flex; flex-wrap: wrap; margin-bottom: 10px; }
     .lang-btn {
       border: 1px solid #ccc; padding: 8px 12px; margin: 3px; border-radius: 5px;
@@ -15,8 +15,9 @@
     .lang-btn:hover { background-color: #e0e0e0; }
     .lang-btn.selected { background-color: #007bff; color: #fff; border-color: #007bff; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; }
     #loading { display: none; color: #007bff; font-weight: bold; }
+    .copy-btn { cursor: pointer; margin-left: 5px; color: #007bff; }
   </style>
 </head>
 <body>
@@ -26,14 +27,6 @@
 <label>Topic / Niche:</label>
 <input type="text" id="topic" placeholder="e.g., Fitness, Travel, Food" value="Food">
 
-<label>Caption Style:</label>
-<select id="style">
-  <option value="Motivational">Motivational</option>
-  <option value="Funny">Funny</option>
-  <option value="Promotional">Promotional</option>
-  <option value="Informative">Informative</option>
-</select>
-
 <label>Select Languages:</label>
 <div class="language-buttons">
   <div class="lang-btn selected" data-lang="English">English</div>
@@ -41,6 +34,7 @@
   <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
   <div class="lang-btn" data-lang="French">French</div>
   <div class="lang-btn" data-lang="German">German</div>
+  <div class="lang-btn" data-lang="Kannada">Kannada</div>
 </div>
 
 <label>Number of Captions:</label>
@@ -61,39 +55,39 @@
   // Toggle language selection
   const langButtons = document.querySelectorAll('.lang-btn');
   langButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      btn.classList.toggle('selected');
-    });
+    btn.addEventListener('click', () => btn.classList.toggle('selected'));
   });
 
   // Default captions fallback
   const defaultCaptions = [
     {
-      "English": "Delicious pizza loaded with cheese! 🍕 #FoodLover #Yummy",
-      "Spanish": "¡Deliciosa pizza llena de queso! 🍕 #AmanteDeLaComida #Delicioso",
-      "Hindi": "पनीर से भरी स्वादिष्ट पिज़्ज़ा! 🍕 #FoodLover #Yummy",
-      "French": "Délicieuse pizza garnie de fromage! 🍕 #AmoureuxDeLaCuisine #Miam",
-      "German": "Leckere Pizza voller Käse! 🍕 #FoodLover #Lecker"
+      "English": "Delicious pizza loaded with cheese! 🍕",
+      "Spanish": "¡Deliciosa pizza llena de queso! 🍕",
+      "Hindi": "पनीर से भरी स्वादिष्ट पिज़्ज़ा! 🍕",
+      "French": "Délicieuse pizza garnie de fromage! 🍕",
+      "German": "Leckere Pizza voller Käse! 🍕",
+      "Kannada": "ಚೀಸ್ ತುಂಬಿದ ರುಚಿಕರ ಪಿಜ್ಜಾ! 🍕"
     },
     {
-      "English": "Freshly baked croissants for a perfect breakfast 🥐 #BreakfastGoals #Foodie",
-      "Spanish": "Cruasanes recién horneados para un desayuno perfecto 🥐 #ObjetivosDeDesayuno #Foodie",
-      "Hindi": "ताज़ा बेक्ड क्रोइसाँस परफेक्ट नाश्ते के लिए 🥐 #BreakfastGoals #Foodie",
-      "French": "Croissants fraîchement cuits pour un petit déjeuner parfait 🥐 #ObjectifsPetitDéjeuner #Foodie",
-      "German": "Frisch gebackene Croissants für ein perfektes Frühstück 🥐 #Frühstücksziele #Foodie"
+      "English": "Freshly baked croissants for a perfect breakfast 🥐",
+      "Spanish": "Cruasanes recién horneados para un desayuno perfecto 🥐",
+      "Hindi": "ताज़ा बेक्ड क्रोइसाँस परफेक्ट नाश्ते के लिए 🥐",
+      "French": "Croissants fraîchement cuits pour un petit déjeuner parfait 🥐",
+      "German": "Frisch gebackene Croissants für ein perfektes Frühstück 🥐",
+      "Kannada": "ಪೂರ್ಣವಾಗಿರುವ ಬೆಳಗಿನ ಭೋಜನಕ್ಕಾಗಿ تازಾ ಕ್ರೋಯ್ಸಾಂ 🥐"
     },
     {
-      "English": "Healthy green smoothie to boost your energy! 🍏 #HealthyEats #FoodieLife",
-      "Spanish": "¡Batido verde saludable para aumentar tu energía! 🍏 #ComidaSaludable #VidaFoodie",
-      "Hindi": "अपनी ऊर्जा बढ़ाने के लिए हेल्दी ग्रीन स्मूदी! 🍏 #HealthyEats #FoodieLife",
-      "French": "Smoothie vert sain pour booster votre énergie! 🍏 #AlimentationSaine #FoodieLife",
-      "German": "Gesunder grüner Smoothie, um deine Energie zu steigern! 🍏 #GesundeErnährung #FoodieLife"
+      "English": "Healthy green smoothie to boost your energy! 🍏",
+      "Spanish": "¡Batido verde saludable para aumentar tu energía! 🍏",
+      "Hindi": "अपनी ऊर्जा बढ़ाने के लिए हेल्दी ग्रीन स्मूदी! 🍏",
+      "French": "Smoothie vert sain pour booster votre énergie! 🍏",
+      "German": "Gesunder grüner Smoothie, um deine Energie zu steigern! 🍏",
+      "Kannada": "ನಿಮ್ಮ ಶಕ್ತಿ ಹೆಚ್ಚಿಸಲು ಆರೋಗ್ಯಕರ ಹಸಿರು ಸ್ಮೂದಿ! 🍏"
     }
   ];
 
   async function generateCaptions() {
     const topic = document.getElementById('topic').value.trim() || "Food";
-    const style = document.getElementById('style').value;
     const languages = Array.from(document.querySelectorAll('.lang-btn.selected')).map(b => b.dataset.lang);
     const count = parseInt(document.getElementById('count').value);
 
@@ -107,7 +101,7 @@
 
     const prompt = `
 You are a social media content expert.
-Generate ${count} ${style} captions about "${topic}".
+Generate ${count} captions about "${topic}".
 Translate each caption into: ${languages.join(', ')}.
 Format as JSON array with keys for each selected language.
 `;
@@ -117,7 +111,7 @@ Format as JSON array with keys for each selected language.
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer YOUR_OPENAI_API_KEY" // Replace with valid key
+          "Authorization": "Bearer YOUR_OPENAI_API_KEY"
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
@@ -143,7 +137,6 @@ Format as JSON array with keys for each selected language.
   }
 
   function displayCaptions(captions, languages) {
-    // Build table
     const headerRow = document.getElementById('tableHeader');
     headerRow.innerHTML = '';
     languages.forEach(lang => {
@@ -154,11 +147,26 @@ Format as JSON array with keys for each selected language.
 
     const tableBody = document.getElementById('tableBody');
     tableBody.innerHTML = '';
+
     captions.forEach(item => {
       const tr = document.createElement('tr');
       languages.forEach(lang => {
         const td = document.createElement('td');
-        td.textContent = item[lang] || '';
+        const textSpan = document.createElement('span');
+        textSpan.textContent = item[lang] || '';
+        td.appendChild(textSpan);
+
+        // Copy button
+        const copyBtn = document.createElement('span');
+        copyBtn.innerHTML = '📋';
+        copyBtn.title = 'Copy';
+        copyBtn.className = 'copy-btn';
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(textSpan.textContent);
+          alert(`Copied to clipboard: ${textSpan.textContent}`);
+        };
+        td.appendChild(copyBtn);
+
         tr.appendChild(td);
       });
       tableBody.appendChild(tr);
