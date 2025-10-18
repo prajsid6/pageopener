@@ -5,47 +5,41 @@
 <title>Social Media Buddy</title>
 <style>
 body {margin:0;font-family:Arial;background:#fff;}
-/* Sidebar */
-#sidebar {position:fixed;left:0;top:0;width:220px;height:100%;background:#fffc00;color:#000;display:flex;flex-direction:column;z-index:2;transition:0.3s;box-shadow:2px 0 5px rgba(0,0,0,0.1);}
-#sidebar.hide{left:-220px;}
-#sidebar h2{text-align:center;padding:15px;font-weight:bold;}
-#sidebar button{background:none;border:none;color:#000;text-align:left;padding:10px 15px;cursor:pointer;font-size:16px;font-weight:bold;}
-#sidebar button:hover{background:#ffe600;}
-#hamburger{position:fixed;top:10px;left:10px;font-size:28px;color:#00c400;cursor:pointer;z-index:3;}
-#content{margin-left:220px;padding:20px;transition:0.3s;}
+#sidebar {position:fixed;left:0;top:0;width:200px;height:100%;background:#fffc00;color:#333;display:flex;flex-direction:column;z-index:2;transition:0.3s;}
+#sidebar.hide{left:-200px;}
+#sidebar h2{text-align:center;padding:10px;}
+#sidebar button{background:none;border:none;color:#333;text-align:left;padding:10px;cursor:pointer;font-size:16px;}
+#sidebar button:hover{background:#f0e500;}
+#content{margin-left:200px;padding:20px;transition:0.3s;}
 #sidebar.hide + #content{margin-left:0;}
-h1{text-align:center;margin-bottom:20px;}
+#hamburger{position:fixed;top:10px;left:10px;font-size:26px;color:#00a000;cursor:pointer;z-index:3;}
+h1{text-align:center;}
 label{font-weight:bold;display:block;margin-top:10px;}
-input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16px;border-radius:5px;border:1px solid #ccc;}
-.language-buttons{display:flex;flex-wrap:wrap;margin-top:5px;}
+input,textarea,button{width:100%;padding:8px;margin-top:5px;font-size:16px;}
+.language-buttons{display:flex;flex-wrap:wrap;}
 .lang-btn{border:1px solid #ccc;border-radius:5px;padding:6px 12px;margin:3px;cursor:pointer;}
-.lang-btn.selected{background:#000;color:#fff;border-color:#000;}
+.lang-btn.selected{background:#007bff;color:white;border-color:#007bff;}
 .generator{display:none;}
-.copy-btn{display:inline-block;background:#000;color:white;padding:3px 6px;border-radius:4px;cursor:pointer;margin-top:4px;font-size:12px;}
-.copy-btn:hover{background:#444;}
+.copy-btn{display:inline-block;background:#007bff;color:white;padding:3px 6px;border-radius:4px;cursor:pointer;margin-top:4px;font-size:12px;}
+.copy-btn:hover{background:#0056b3;}
 #disclaimer{background:#ffcc00;color:#333;padding:10px;text-align:center;position:fixed;top:0;left:0;width:100%;font-weight:bold;z-index:9999;}
 #disclaimer button{margin-left:10px;padding:4px 10px;cursor:pointer;}
-.card{background:#fff59d;padding:15px;margin-bottom:15px;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.1);}
-.social-card{text-align:center;margin:auto;margin-top:20px;max-width:400px;background:#fff59d;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
+.social-card{text-align:center;margin:auto;margin-top:30px;max-width:400px;background:#f5f5f5;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1);}
 .social-card img{width:100px;height:100px;border-radius:50%;}
 .social-icons{display:flex;justify-content:center;gap:15px;margin-top:10px;}
 .social-icons a{text-decoration:none;font-size:22px;color:#333;}
-.social-icons a:hover{color:#000;}
-.trending-container{margin-top:20px;background:#fff9b0;padding:10px;border-radius:8px;box-shadow:0 0 5px rgba(0,0,0,0.1);}
+.social-icons a:hover{color:#007bff;}
+.trending-container{margin-top:20px;background:#f7f7f7;padding:10px;border-radius:8px;box-shadow:0 0 5px rgba(0,0,0,0.1);}
 .trending-header{display:flex;justify-content:space-between;align-items:center;}
 .trending-header h3{margin:0;}
-.refresh-btn{background:#000;color:white;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:14px;}
-.refresh-btn:hover{background:#444;}
+.refresh-btn{background:#007bff;color:white;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:14px;}
+.refresh-btn:hover{background:#0056b3;}
 .trending-post{border-bottom:1px solid #ddd;padding:8px 0;}
 .trending-post:last-child{border:none;}
-.trending-post h4{margin:0;font-size:16px;color:#000;}
+.trending-post h4{margin:0;font-size:16px;color:#333;}
 .trending-post p{margin:4px 0;font-size:14px;}
 .trending-platform{font-size:12px;color:#555;}
-.generated-item{background:#fff59d;padding:8px;margin:6px 0;border-radius:6px;}
-.analytics-cards{display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px;}
-.card-small{flex:1;min-width:120px;padding:10px;background:#fff59d;border-radius:10px;text-align:center;box-shadow:0 0 5px rgba(0,0,0,0.1);}
-.card-small h4{margin:5px 0;font-size:14px;}
-.card-small p{margin:0;font-size:18px;font-weight:bold;}
+.generated-item{margin-top:10px;padding:5px;border-bottom:1px dashed #ccc;}
 </style>
 </head>
 <body>
@@ -80,11 +74,12 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
   <h1>Dashboard</h1>
   <p id="welcome"></p>
   <button onclick="logout()" id="logout-btn" style="display:none;">Logout</button>
-  <div class="analytics-cards">
-    <div class="card-small"><h4>Followers</h4><p id="followers">0</p></div>
-    <div class="card-small"><h4>Engagement</h4><p id="engagement">0%</p></div>
-    <div class="card-small"><h4>Posts This Week</h4><p id="posts">0</p></div>
-  </div>
+  <h3>Analytics Overview</h3>
+  <p><b>Followers:</b> <span id="followers">0</span></p>
+  <p><b>Engagement Rate:</b> <span id="engagement">0%</span></p>
+  <p><b>Posts This Week:</b> <span id="posts">0</span></p>
+
+  <!-- What's Trending Section -->
   <div class="trending-container">
     <div class="trending-header">
       <h3>🔥 What's Trending</h3>
@@ -100,23 +95,54 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
   <input id="caption-topic" placeholder="Enter topic like Food, Travel...">
   <label>Number of Captions:</label>
   <input type="number" id="caption-count" value="3" min="1" max="10">
-  
   <label>Select Languages:</label>
   <div class="language-buttons" id="caption-langs">
     <div class="lang-btn selected" data-lang="English">English</div>
     <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
     <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
   </div>
-  
   <button onclick="generateCaption()">Generate Captions</button>
-  <button onclick="copyAllCaptions()">Copy All</button>
   <div id="caption-output"></div>
+</div>
+
+<!-- Meme Generator -->
+<div id="meme" class="generator">
+  <h1>Meme Generator</h1>
+  <input id="meme-topic" placeholder="Enter meme idea...">
+  <label>Number of Memes:</label>
+  <input type="number" id="meme-count" value="3" min="1" max="10">
+  <label>Select Languages:</label>
+  <div class="language-buttons" id="meme-langs">
+    <div class="lang-btn selected" data-lang="English">English</div>
+    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
+    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
+  </div>
+  <button onclick="generateMeme()">Generate Meme</button>
+  <div id="meme-output"></div>
+</div>
+
+<!-- Bio Generator -->
+<div id="bio" class="generator">
+  <h1>Bio Generator</h1>
+  <textarea id="bio-input" placeholder="Enter your profession or vibe..."></textarea>
+  <label>Number of Bios:</label>
+  <input type="number" id="bio-count" value="3" min="1" max="10">
+  <label>Select Languages:</label>
+  <div class="language-buttons" id="bio-langs">
+    <div class="lang-btn selected" data-lang="English">English</div>
+    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
+    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
+  </div>
+  <button onclick="generateBio()">Generate Bios</button>
+  <div id="bio-output"></div>
 </div>
 
 <!-- Post Content Generator -->
 <div id="post" class="generator">
   <h1>Post Content Generator</h1>
   <textarea id="post-desc" placeholder="Describe your post idea..."></textarea>
+  <label>Number of Posts:</label>
+  <input type="number" id="post-count" value="3" min="1" max="10">
   <label>Select Languages:</label>
   <div class="language-buttons" id="post-langs">
     <div class="lang-btn selected" data-lang="English">English</div>
@@ -127,18 +153,12 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
   <div id="post-output"></div>
 </div>
 
-<!-- Bio Generator -->
-<div id="bio" class="generator">
-  <h1>Bio Generator</h1>
-  <textarea id="bio-input" placeholder="Enter your profession or vibe..."></textarea>
-  <label>Select Languages:</label>
-  <div class="language-buttons" id="bio-langs">
-    <div class="lang-btn selected" data-lang="English">English</div>
-    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
-    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
-  </div>
-  <button onclick="generateBio()">Generate Bios</button>
-  <div id="bio-output"></div>
+<!-- Video Downloader -->
+<div id="video" class="generator">
+  <h1>Video Downloader</h1>
+  <input id="video-url" placeholder="Enter video URL...">
+  <button onclick="generateVideo()">Download</button>
+  <div id="video-output"></div>
 </div>
 
 <!-- Language Translator -->
@@ -155,20 +175,13 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
   <div id="translate-output"></div>
 </div>
 
-<!-- Video Downloader -->
-<div id="video" class="generator">
-  <h1>Video Downloader</h1>
-  <input id="video-url" placeholder="Enter video URL...">
-  <button onclick="generateVideo()">Download</button>
-  <div id="video-output"></div>
-</div>
-
 <!-- Profile Search -->
 <div id="profile" class="generator">
   <h1>Profile Search</h1>
   <input id="profile-name" placeholder="Enter username...">
   <button onclick="searchProfile()">Search Profiles</button>
   <div id="profile-output"></div>
+
   <h3>Add New Social Media Account</h3>
   <input id="new-account-name" placeholder="Account Name (e.g. Instagram)">
   <input id="new-account-url" placeholder="URL (e.g. https://instagram.com/user)">
@@ -197,7 +210,7 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
 document.getElementById('hamburger').onclick=()=>document.getElementById('sidebar').classList.toggle('hide');
 document.getElementById('disclaimer-btn').onclick=()=>document.getElementById('disclaimer').style.display='none';
 
-// Language button toggle for all sections
+// Language button toggle
 document.querySelectorAll('.language-buttons .lang-btn').forEach(btn=>{
   btn.onclick=()=>btn.classList.toggle('selected');
 });
@@ -238,55 +251,68 @@ function generateCaption(){
   let output='';
   langs.forEach(lang=>{
     for(let i=1;i<=count;i++){
-      output+=`<div class="generated-item">
-        <p>${lang}: ${topic} vibes #${i} ${emoji}</p>
-        <div class='copy-btn' onclick='copyText(this)'>Copy</div>
-      </div>`;
+      output+=`<div class="generated-item"><p>${lang}: ${topic} vibes #${i} ${emoji}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
     }
   });
   document.getElementById('caption-output').innerHTML=output;
 }
-function copyAllCaptions(){
-  const texts=Array.from(document.querySelectorAll('#caption-output p')).map(p=>p.textContent);
-  if(texts.length===0){alert('No captions generated');return;}
-  navigator.clipboard.writeText(texts.join('\n'));
-  alert('All captions copied!');
-}
 
-// Post Generator
-function generatePost(){
-  const desc=document.getElementById('post-desc').value||'Sharing thoughts';
-  const langs=Array.from(document.querySelectorAll('#post-langs .lang-btn.selected')).map(b=>b.dataset.lang);
+// Meme Generator
+function generateMeme(){
+  const topic=document.getElementById('meme-topic').value.trim() || 'Weekend vibes';
+  const count = parseInt(document.getElementById('meme-count').value) || 3;
+  const langs = Array.from(document.querySelectorAll('#meme-langs .lang-btn.selected')).map(b=>b.dataset.lang);
+  const sampleMemes = [
+    `When you realize weekend is over 😭`,
+    `That feeling when coffee is finished ☕`,
+    `Monday morning struggle 😅`,
+    `When code finally works 🎉`,
+    `Unexpected bug in production 🤯`
+  ];
   let output='';
   langs.forEach(lang=>{
-    for(let i=1;i<=3;i++){
-      output+=`<div class="generated-item"><p>${lang} Post #${i}: ${desc}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
+    for(let i=0;i<count;i++){
+      const meme = sampleMemes[Math.floor(Math.random()*sampleMemes.length)];
+      output += `<div class="generated-item"><p>${lang} Meme #${i+1}: ${meme}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
     }
   });
-  document.getElementById('post-output').innerHTML=output;
+  document.getElementById('meme-output').innerHTML = output;
 }
 
 // Bio Generator
 function generateBio(){
-  const input=document.getElementById('bio-input').value||'Software Tester';
-  const langs=Array.from(document.querySelectorAll('#bio-langs .lang-btn.selected')).map(b=>b.dataset.lang);
-  let output='';
-  const bios=[`${input} | Coffee Lover ☕`,`${input} | AI Enthusiast 🤖`,`${input} | Traveler ✈️`];
+  const input = document.getElementById('bio-input').value || 'Software Tester';
+  const count = parseInt(document.getElementById('bio-count').value) || 3;
+  const langs = Array.from(document.querySelectorAll('#bio-langs .lang-btn.selected')).map(b=>b.dataset.lang);
+  const sampleBios = [
+    `${input} | Coffee Lover ☕`,
+    `${input} | AI Enthusiast 🤖`,
+    `${input} | Traveler ✈️`,
+    `${input} | Gamer 🎮`,
+    `${input} | Music Lover 🎵`
+  ];
+  let output = '';
   langs.forEach(lang=>{
-    bios.forEach(b=>output+=`<div class="generated-item"><p>${lang}: ${b}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`);
+    for(let i=0;i<count;i++){
+      const bio = sampleBios[Math.floor(Math.random()*sampleBios.length)];
+      output += `<div class="generated-item"><p>${lang} Bio #${i+1}: ${bio}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
+    }
   });
-  document.getElementById('bio-output').innerHTML=output;
+  document.getElementById('bio-output').innerHTML = output;
 }
 
-// Translator
-function generateTranslate(){
-  const text=document.getElementById('translate-text').value;
-  const langs=Array.from(document.querySelectorAll('#translate-langs .lang-btn.selected')).map(b=>b.dataset.lang);
+// Post Generator
+function generatePost(){
+  const desc = document.getElementById('post-desc').value || 'Sharing thoughts';
+  const count = parseInt(document.getElementById('post-count').value) || 3;
+  const langs = Array.from(document.querySelectorAll('#post-langs .lang-btn.selected')).map(b=>b.dataset.lang);
   let output='';
   langs.forEach(lang=>{
-    output+=`<div class="generated-item"><p>Translated to ${lang}: "${text}" (demo)</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
+    for(let i=0;i<count;i++){
+      output += `<div class="generated-item"><p>${lang} Post #${i+1}: ${desc}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
+    }
   });
-  document.getElementById('translate-output').innerHTML=output;
+  document.getElementById('post-output').innerHTML = output;
 }
 
 // Video Downloader
@@ -295,22 +321,46 @@ function generateVideo(){
   document.getElementById('video-output').innerHTML=`<p>Download ready: <a href="${url}" target="_blank">${url}</a></p>`;
 }
 
-// Profile Search & Add Social
+// Translate
+function generateTranslate(){
+  const text=document.getElementById('translate-text').value;
+  const langs = Array.from(document.querySelectorAll('#translate-langs .lang-btn.selected')).map(b=>b.dataset.lang);
+  let output='';
+  langs.forEach(lang=>{
+    output += `<div class="generated-item"><p>Translated to ${lang}: "${text}" (demo)</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
+  });
+  document.getElementById('translate-output').innerHTML = output;
+}
+
+// Profile Search
 function searchProfile(){
   const name=document.getElementById('profile-name').value;
-  document.getElementById('profile-output').innerHTML=`
-    <p>Instagram: <a href='https://instagram.com/${name}' target='_blank'>@${name}</a></p>
-    <p>Twitter: <a href='https://twitter.com/${name}' target='_blank'>@${name}</a></p>
-    <p>LinkedIn: <a href='https://linkedin.com/in/${name}' target='_blank'>@${name}</a></p>
-    <p>YouTube: <a href='https://youtube.com/@${name}' target='_blank'>@${name}</a></p>`;
+  const accounts = ['Instagram','Twitter','LinkedIn','YouTube'];
+  let output='';
+  accounts.forEach(acc=>{
+    output+=`<p>${acc}: <a href='https://${acc.toLowerCase()}.com/${name}' target='_blank'>@${name}</a></p>`;
+  });
+  document.getElementById('profile-output').innerHTML=output;
 }
+
+// Add New Social Account
 function addSocialAccount(){
-  const n=document.getElementById('new-account-name').value.trim();
-  const u=document.getElementById('new-account-url').value.trim();
-  if(!n||!u){alert('Enter both name and URL');return;}
-  const div=document.createElement('div'); div.innerHTML=`<a href="${u}" target="_blank">${n}</a>`;
+  const name=document.getElementById('new-account-name').value.trim();
+  const url=document.getElementById('new-account-url').value.trim();
+  if(!name || !url) return alert('Enter both name and URL');
+  const div=document.createElement('div');
+  div.innerHTML=`<p>${name}: <a href="${url}" target="_blank">${url}</a></p>`;
   document.getElementById('added-accounts').appendChild(div);
-  document.getElementById('card-icons').innerHTML+=`<a href="${u}" target="_blank">${n[0]}</a>`;
+  document.getElementById('new-account-name').value='';
+  document.getElementById('new-account-url').value='';
+}
+
+// Copy Function
+function copyText(btn){
+  const text=btn.parentElement.querySelector('p').textContent.trim();
+  navigator.clipboard.writeText(text);
+  btn.textContent="Copied!";
+  setTimeout(()=>btn.textContent="Copy",2000);
 }
 
 // Dashboard Analytics
@@ -321,7 +371,7 @@ function randomize(){
 }
 randomize();
 
-// Trending
+// Trending Section
 function loadTrending(){
   const platforms=["Instagram","Twitter","YouTube","LinkedIn"];
   const samplePosts=[
@@ -334,10 +384,19 @@ function loadTrending(){
   ];
   let posts=[];
   for(let i=0;i<4;i++){
-    posts.push({platform:platforms[i],title:samplePosts[Math.floor(Math.random()*samplePosts.length)],text:"Trending now on "+platforms[i]+"!"});
+    posts.push({
+      platform:platforms[i],
+      title:samplePosts[Math.floor(Math.random()*samplePosts.length)],
+      text:"Trending now on "+platforms[i]+"!"
+    });
   }
   const list=document.getElementById('trending-list');
-  list.innerHTML=posts.map(p=>`<div class="trending-post"><h4>${p.title}</h4><p>${p.text}</p><span class="trending-platform">📱 ${p.platform}</span></div>`).join('');
+  list.innerHTML=posts.map(p=>`
+    <div class="trending-post">
+      <h4>${p.title}</h4>
+      <p>${p.text}</p>
+      <span class="trending-platform">📱 ${p.platform}</span>
+    </div>`).join('');
 }
 loadTrending();
 </script>
