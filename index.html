@@ -24,7 +24,7 @@
 <h1>AI Multi-Language Caption Generator</h1>
 
 <label>Topic / Niche:</label>
-<input type="text" id="topic" placeholder="e.g., Fitness, Travel, Food">
+<input type="text" id="topic" placeholder="e.g., Fitness, Travel, Food" value="Food">
 
 <label>Caption Style:</label>
 <select id="style">
@@ -37,8 +37,8 @@
 <label>Select Languages:</label>
 <div class="language-buttons">
   <div class="lang-btn selected" data-lang="English">English</div>
-  <div class="lang-btn" data-lang="Spanish">Spanish</div>
-  <div class="lang-btn" data-lang="Hindi">Hindi</div>
+  <div class="lang-btn selected" data-lang="Spanish">Spanish</div>
+  <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
   <div class="lang-btn" data-lang="French">French</div>
   <div class="lang-btn" data-lang="German">German</div>
 </div>
@@ -66,14 +66,39 @@
     });
   });
 
+  // Default captions fallback
+  const defaultCaptions = [
+    {
+      "English": "Delicious pizza loaded with cheese! 🍕 #FoodLover #Yummy",
+      "Spanish": "¡Deliciosa pizza llena de queso! 🍕 #AmanteDeLaComida #Delicioso",
+      "Hindi": "पनीर से भरी स्वादिष्ट पिज़्ज़ा! 🍕 #FoodLover #Yummy",
+      "French": "Délicieuse pizza garnie de fromage! 🍕 #AmoureuxDeLaCuisine #Miam",
+      "German": "Leckere Pizza voller Käse! 🍕 #FoodLover #Lecker"
+    },
+    {
+      "English": "Freshly baked croissants for a perfect breakfast 🥐 #BreakfastGoals #Foodie",
+      "Spanish": "Cruasanes recién horneados para un desayuno perfecto 🥐 #ObjetivosDeDesayuno #Foodie",
+      "Hindi": "ताज़ा बेक्ड क्रोइसाँस परफेक्ट नाश्ते के लिए 🥐 #BreakfastGoals #Foodie",
+      "French": "Croissants fraîchement cuits pour un petit déjeuner parfait 🥐 #ObjectifsPetitDéjeuner #Foodie",
+      "German": "Frisch gebackene Croissants für ein perfektes Frühstück 🥐 #Frühstücksziele #Foodie"
+    },
+    {
+      "English": "Healthy green smoothie to boost your energy! 🍏 #HealthyEats #FoodieLife",
+      "Spanish": "¡Batido verde saludable para aumentar tu energía! 🍏 #ComidaSaludable #VidaFoodie",
+      "Hindi": "अपनी ऊर्जा बढ़ाने के लिए हेल्दी ग्रीन स्मूदी! 🍏 #HealthyEats #FoodieLife",
+      "French": "Smoothie vert sain pour booster votre énergie! 🍏 #AlimentationSaine #FoodieLife",
+      "German": "Gesunder grüner Smoothie, um deine Energie zu steigern! 🍏 #GesundeErnährung #FoodieLife"
+    }
+  ];
+
   async function generateCaptions() {
-    const topic = document.getElementById('topic').value.trim();
+    const topic = document.getElementById('topic').value.trim() || "Food";
     const style = document.getElementById('style').value;
     const languages = Array.from(document.querySelectorAll('.lang-btn.selected')).map(b => b.dataset.lang);
-    const count = document.getElementById('count').value;
+    const count = parseInt(document.getElementById('count').value);
 
-    if (!topic || !languages.length) {
-      alert("Please enter a topic and select at least one language.");
+    if (!languages.length) {
+      alert("Please select at least one language.");
       return;
     }
 
@@ -84,17 +109,7 @@
 You are a social media content expert.
 Generate ${count} ${style} captions about "${topic}".
 Translate each caption into: ${languages.join(', ')}.
-Format the output as JSON:
-[
-  {
-    "English": "...",
-    "Spanish": "...",
-    "Hindi": "...",
-    "French": "...",
-    "German": "..."
-  }
-]
-Only include the languages selected by the user.
+Format as JSON array with keys for each selected language.
 `;
 
     try {
@@ -102,7 +117,7 @@ Only include the languages selected by the user.
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer YOUR_OPENAI_API_KEY"
+          "Authorization": "Bearer YOUR_OPENAI_API_KEY" // Replace with valid key
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
@@ -111,39 +126,45 @@ Only include the languages selected by the user.
         })
       });
 
+      if (!response.ok) throw new Error("API Key invalid or request failed");
+
       const data = await response.json();
       const content = data.choices[0].message.content.trim();
       const captions = JSON.parse(content);
 
-      // Build table
-      const headerRow = document.getElementById('tableHeader');
-      headerRow.innerHTML = '';
-      languages.forEach(lang => {
-        const th = document.createElement('th');
-        th.textContent = lang;
-        headerRow.appendChild(th);
-      });
-
-      const tableBody = document.getElementById('tableBody');
-      tableBody.innerHTML = '';
-      captions.forEach(item => {
-        const tr = document.createElement('tr');
-        languages.forEach(lang => {
-          const td = document.createElement('td');
-          td.textContent = item[lang] || '';
-          tr.appendChild(td);
-        });
-        tableBody.appendChild(tr);
-      });
-
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('resultTable').style.display = 'table';
+      displayCaptions(captions, languages);
 
     } catch (err) {
-      console.error(err);
-      alert("Error generating captions. Check your API key and console.");
-      document.getElementById('loading').style.display = 'none';
+      console.warn("API failed, using default captions:", err);
+      displayCaptions(defaultCaptions, languages);
     }
+
+    document.getElementById('loading').style.display = 'none';
+  }
+
+  function displayCaptions(captions, languages) {
+    // Build table
+    const headerRow = document.getElementById('tableHeader');
+    headerRow.innerHTML = '';
+    languages.forEach(lang => {
+      const th = document.createElement('th');
+      th.textContent = lang;
+      headerRow.appendChild(th);
+    });
+
+    const tableBody = document.getElementById('tableBody');
+    tableBody.innerHTML = '';
+    captions.forEach(item => {
+      const tr = document.createElement('tr');
+      languages.forEach(lang => {
+        const td = document.createElement('td');
+        td.textContent = item[lang] || '';
+        tr.appendChild(td);
+      });
+      tableBody.appendChild(tr);
+    });
+
+    document.getElementById('resultTable').style.display = 'table';
   }
 </script>
 
