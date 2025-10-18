@@ -1,3 +1,19 @@
+Perfect! 😄 Let’s enhance Social Media Buddy as per your requests:
+
+Changes implemented
+	1.	Meme Generator:
+	•	Added dummy memes so it generates multiple rows based on the number input (like captions)
+	•	Output will use fallback memes until API key is added
+	2.	Bio Generator:
+	•	Input user’s name / niche / bio
+	•	Generates bios in different languages
+	•	Added dummy bios for “Software Tester”
+	3.	UI changes:
+	•	Hamburger icon turns white when sidebar is collapsed
+	•	Cleaner look for bio input section
+
+Here’s the updated code:
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,10 +27,11 @@
   #sidebar button { background:none; border:none; color:#fff; text-align:left; padding:10px; cursor:pointer; font-size:16px; }
   #sidebar button:hover { background:#444; }
   #content { flex:1; padding:20px; overflow:auto; }
-  #hamburger { position:absolute; top:10px; left:10px; font-size:24px; cursor:pointer; color:#333; }
+  #hamburger { position:absolute; top:10px; left:10px; font-size:24px; cursor:pointer; color:#333; transition: 0.3s; }
+  #hamburger.collapsed { color:#fff; }
   h1 { text-align:center; }
   label { font-weight:bold; display:block; margin-top:10px; }
-  input, button { margin:5px 0; padding:8px; font-size:16px; }
+  input, button, textarea { margin:5px 0; padding:8px; font-size:16px; }
   .language-buttons { display:flex; flex-wrap:wrap; margin-bottom:10px; }
   .lang-btn { border:1px solid #ccc; padding:8px 12px; margin:3px; border-radius:5px; cursor:pointer; background:#f9f9f9; transition:0.2s; }
   .lang-btn:hover { background:#e0e0e0; }
@@ -25,6 +42,7 @@
   .copy-btn:hover { background:#0056b3; }
   #loading { display:none; color:#007bff; font-weight:bold; }
   .generator { display:none; }
+  textarea { width:100%; min-height:60px; }
 </style>
 </head>
 <body>
@@ -39,162 +57,189 @@
 </div>
 
 <div id="content">
-  <div id="caption" class="generator">
-    <h1>Multi-Language Caption Generator</h1>
-    <label>Topic / Niche:</label>
-    <input type="text" id="caption-topic" placeholder="e.g., Fitness, Travel, Food" value="Food">
-    <label>Select Languages:</label>
-    <div class="language-buttons" id="caption-langs">
-      <div class="lang-btn selected" data-lang="English">English</div>
-      <div class="lang-btn selected" data-lang="Spanish">Spanish</div>
-      <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
-      <div class="lang-btn" data-lang="French">French</div>
-      <div class="lang-btn" data-lang="German">German</div>
-      <div class="lang-btn" data-lang="Kannada">Kannada</div>
-    </div>
-    <label>Number of Captions:</label>
-    <input type="number" id="caption-count" value="5" min="1" max="20">
-    <button onclick="generateCaptions()">Generate Captions</button>
-    <div id="caption-loading">Generating captions... ⏳</div>
-    <table id="caption-table" style="display:none;">
-      <thead><tr id="caption-header"></tr></thead>
-      <tbody id="caption-body"></tbody>
-    </table>
-  </div>
 
-  <div id="meme" class="generator">
-    <h1>Multi-Language Meme Generator</h1>
-    <label>Theme / Text:</label>
-    <input type="text" id="meme-text" placeholder="e.g., Food, Coding, Fitness">
-    <label>Select Languages:</label>
-    <div class="language-buttons" id="meme-langs">
-      <div class="lang-btn selected" data-lang="English">English</div>
-      <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
-      <div class="lang-btn" data-lang="Hindi">Hindi</div>
-    </div>
-    <button onclick="generateMeme()">Generate Meme Text</button>
-    <div id="meme-loading">Generating meme... ⏳</div>
-    <table id="meme-table" style="display:none;">
-      <thead><tr id="meme-header"></tr></thead>
-      <tbody id="meme-body"></tbody>
-    </table>
+<!-- Caption Generator -->
+<div id="caption" class="generator">
+  <h1>Multi-Language Caption Generator</h1>
+  <label>Topic / Niche:</label>
+  <input type="text" id="caption-topic" placeholder="e.g., Fitness, Travel, Food" value="Food">
+  <label>Select Languages:</label>
+  <div class="language-buttons" id="caption-langs">
+    <div class="lang-btn selected" data-lang="English">English</div>
+    <div class="lang-btn selected" data-lang="Spanish">Spanish</div>
+    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
+    <div class="lang-btn" data-lang="French">French</div>
+    <div class="lang-btn" data-lang="German">German</div>
+    <div class="lang-btn" data-lang="Kannada">Kannada</div>
   </div>
+  <label>Number of Captions:</label>
+  <input type="number" id="caption-count" value="5" min="1" max="20">
+  <button onclick="generateCaptions()">Generate Captions</button>
+  <div id="caption-loading">Generating captions... ⏳</div>
+  <table id="caption-table" style="display:none;">
+    <thead><tr id="caption-header"></tr></thead>
+    <tbody id="caption-body"></tbody>
+  </table>
+</div>
 
-  <div id="bio" class="generator">
-    <h1>Social Media Bio Generator</h1>
-    <label>Name / Niche:</label>
-    <input type="text" id="bio-topic" placeholder="e.g., Fitness Coach, Traveler">
-    <label>Select Languages:</label>
-    <div class="language-buttons" id="bio-langs">
-      <div class="lang-btn selected" data-lang="English">English</div>
-      <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
-      <div class="lang-btn" data-lang="Hindi">Hindi</div>
-    </div>
-    <button onclick="generateBio()">Generate Bios</button>
-    <div id="bio-loading">Generating bios... ⏳</div>
-    <table id="bio-table" style="display:none;">
-      <thead><tr id="bio-header"></tr></thead>
-      <tbody id="bio-body"></tbody>
-    </table>
+<!-- Meme Generator -->
+<div id="meme" class="generator">
+  <h1>Multi-Language Meme Generator</h1>
+  <label>Theme / Text:</label>
+  <input type="text" id="meme-text" placeholder="e.g., Food, Coding, Fitness" value="Coding">
+  <label>Select Languages:</label>
+  <div class="language-buttons" id="meme-langs">
+    <div class="lang-btn selected" data-lang="English">English</div>
+    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
+    <div class="lang-btn" data-lang="Hindi">Hindi</div>
   </div>
+  <label>Number of Memes:</label>
+  <input type="number" id="meme-count" value="3" min="1" max="10">
+  <button onclick="generateMeme()">Generate Memes</button>
+  <div id="meme-loading">Generating memes... ⏳</div>
+  <table id="meme-table" style="display:none;">
+    <thead><tr id="meme-header"></tr></thead>
+    <tbody id="meme-body"></tbody>
+  </table>
+</div>
+
+<!-- Bio Generator -->
+<div id="bio" class="generator">
+  <h1>Social Media Bio Generator</h1>
+  <label>Enter Your Bio / Niche:</label>
+  <textarea id="bio-topic" placeholder="e.g., Software Tester, Traveler"></textarea>
+  <label>Select Languages:</label>
+  <div class="language-buttons" id="bio-langs">
+    <div class="lang-btn selected" data-lang="English">English</div>
+    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
+    <div class="lang-btn" data-lang="Hindi">Hindi</div>
+  </div>
+  <button onclick="generateBio()">Generate Bios</button>
+  <div id="bio-loading">Generating bios... ⏳</div>
+  <table id="bio-table" style="display:none;">
+    <thead><tr id="bio-header"></tr></thead>
+    <tbody id="bio-body"></tbody>
+  </table>
+</div>
 
 </div>
 
 <script>
-  // Hamburger toggle
-  const hamburger = document.getElementById('hamburger');
-  const sidebar = document.getElementById('sidebar');
-  hamburger.addEventListener('click', () => sidebar.classList.toggle('hide'));
+const hamburger = document.getElementById('hamburger');
+const sidebar = document.getElementById('sidebar');
+hamburger.addEventListener('click', ()=>{
+  sidebar.classList.toggle('hide');
+  hamburger.classList.toggle('collapsed');
+});
 
-  // Show generator
-  function showGenerator(id) {
-    document.querySelectorAll('.generator').forEach(g => g.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-  }
-  showGenerator('caption'); // default
+function showGenerator(id) {
+  document.querySelectorAll('.generator').forEach(g=>g.style.display='none');
+  document.getElementById(id).style.display='block';
+}
+showGenerator('caption'); // default
 
-  // Toggle language selection
-  document.querySelectorAll('.language-buttons').forEach(div => {
-    div.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => btn.classList.toggle('selected'));
-    });
+// Toggle language selection
+document.querySelectorAll('.language-buttons').forEach(div=>{
+  div.querySelectorAll('.lang-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>btn.classList.toggle('selected'));
   });
+});
 
-  // Default captions fallback
-  const defaultCaptions = [
-    {"English":"Delicious pizza 🍕","Kannada":"ಚೀಸ್ ಪಿಜ್ಜಾ 🍕","Hindi":"पिज़्ज़ा 🍕"},
-    {"English":"Fresh croissants 🥐","Kannada":"ಕ್ರೋಸಾಂ 🥐","Hindi":"क्रोइसाँस 🥐"},
-    {"English":"Healthy smoothie 🍏","Kannada":"ಹಸಿರು ಸ್ಮೂದಿ 🍏","Hindi":"हरी स्मूदी 🍏"}
-  ];
+// Dummy fallback captions
+const defaultCaptions = [
+  {"English":"Delicious pizza 🍕","Kannada":"ಚೀಸ್ ಪಿಜ್ಜಾ 🍕","Hindi":"पिज़्ज़ा 🍕"},
+  {"English":"Fresh croissants 🥐","Kannada":"ಕ್ರೋಸಾಂ 🥐","Hindi":"क्रोइसाँस 🥐"},
+  {"English":"Healthy smoothie 🍏","Kannada":"ಹಸಿರು ಸ್ಮೂದಿ 🍏","Hindi":"हरी स्मूदी 🍏"}
+];
 
-  // Generate captions
-  function generateCaptions() {
-    const topic = document.getElementById('caption-topic').value;
-    const langs = Array.from(document.getElementById('caption-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
-    const count = parseInt(document.getElementById('caption-count').value);
-    const loading = document.getElementById('caption-loading');
-    const table = document.getElementById('caption-table');
-    loading.style.display='block'; table.style.display='none';
+// Dummy memes
+const defaultMemes = [
+  {"English":"When code works on first try 😂","Kannada":"ಮೊದಲ ಪ್ರಯತ್ನದಲ್ಲಿ ಕೋಡ್ ಕೆಲಸ ಮಾಡುತ್ತಿದೆ 😂","Hindi":"कोड पहली कोशिश में काम कर गया 😂"},
+  {"English":"Debugging be like 🤯","Kannada":"ಡಿಬಗಿಂಗ್ ಹೀಗಿದೆ 🤯","Hindi":"डिबगिंग ऐसा है 🤯"},
+  {"English":"Coffee first, then commit ☕","Kannada":"ಮೊದಲು ಕಾಫಿ, ನಂತರ ಕಮಿಟ್ ☕","Hindi":"पहले कॉफी, फिर कमिट ☕"}
+];
 
-    // For demo fallback
-    setTimeout(()=>{
-      displayTable('caption', defaultCaptions, langs);
-      loading.style.display='none';
-    },500);
-  }
+// Dummy bios
+const defaultBios = [
+  {"English":"Software Tester | Coffee Lover","Kannada":"ಸಾಫ್ಟ್‌ವೇರ್ ಟೆಸ್ಟರ್ | ಕಾಫಿ ಪ್ರಿಯ","Hindi":"सॉफ्टवेयर टेस्टर | कॉफ़ी प्रेमी"},
+  {"English":"QA Engineer | Problem Solver","Kannada":"QA ಎಂಜಿನಿಯರ್ | ಸಮಸ್ಯೆ ಪರಿಹಾರಕ","Hindi":"QA इंजीनियर | समस्या हल करने वाला"}
+];
 
-  // Generate meme text
-  function generateMeme() {
-    const text = document.getElementById('meme-text').value;
-    const langs = Array.from(document.getElementById('meme-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
-    const loading = document.getElementById('meme-loading');
-    const table = document.getElementById('meme-table');
-    loading.style.display='block'; table.style.display='none';
-    const data = langs.map(l=> ({[l]:text+" "+l}));
-    setTimeout(()=>{ displayTable('meme', data, langs); loading.style.display='none'; },300);
-  }
+// Caption Generator
+function generateCaptions(){
+  const topic = document.getElementById('caption-topic').value;
+  const langs = Array.from(document.getElementById('caption-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
+  const count = parseInt(document.getElementById('caption-count').value);
+  const loading = document.getElementById('caption-loading');
+  const table = document.getElementById('caption-table');
+  loading.style.display='block'; table.style.display='none';
+  
+  // For demo fallback
+  setTimeout(()=>{
+    const data = [];
+    for(let i=0;i<count;i++) data.push(defaultCaptions[i % defaultCaptions.length]);
+    displayTable('caption', data, langs);
+    loading.style.display='none';
+  },500);
+}
 
-  // Generate bios
-  function generateBio() {
-    const topic = document.getElementById('bio-topic').value;
-    const langs = Array.from(document.getElementById('bio-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
-    const loading = document.getElementById('bio-loading');
-    const table = document.getElementById('bio-table');
-    loading.style.display='block'; table.style.display='none';
-    const data = langs.map(l=> ({[l]: topic + " Bio in "+l}));
-    setTimeout(()=>{ displayTable('bio', data, langs); loading.style.display='none'; },300);
-  }
+// Meme Generator
+function generateMeme(){
+  const text = document.getElementById('meme-text').value;
+  const langs = Array.from(document.getElementById('meme-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
+  const count = parseInt(document.getElementById('meme-count').value);
+  const loading = document.getElementById('meme-loading');
+  const table = document.getElementById('meme-table');
+  loading.style.display='block'; table.style.display='none';
 
-  // Display table helper
-  function displayTable(type, data, langs){
-    const tableBody = document.getElementById(type+'-body');
-    const header = document.getElementById(type+'-header');
-    header.innerHTML=''; tableBody.innerHTML='';
+  setTimeout(()=>{
+    const data = [];
+    for(let i=0;i<count;i++){
+      data.push(defaultMemes[i % defaultMemes.length]);
+    }
+    displayTable('meme', data, langs);
+    loading.style.display='none';
+  },500);
+}
+
+// Bio Generator
+function generateBio(){
+  const topic = document.getElementById('bio-topic').value.trim() || "Software Tester";
+  const langs = Array.from(document.getElementById('bio-langs').querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
+  const loading = document.getElementById('bio-loading');
+  const table = document.getElementById('bio-table');
+  loading.style.display='block'; table.style.display='none';
+
+  setTimeout(()=>{
+    const data = [];
+    // User input bio
+    const bioObj = {};
     langs.forEach(l=>{
-      const th = document.createElement('th'); th.textContent=l; header.appendChild(th);
+      bioObj[l] = topic + " Bio in " + l;
     });
-    data.forEach(item=>{
-      const tr=document.createElement('tr');
-      langs.forEach(l=>{
-        const td=document.createElement('td');
-        const span=document.createElement('span'); span.textContent=item[l]||''; td.appendChild(span);
-        const copyBtn=document.createElement('span');
-        copyBtn.className='copy-btn'; copyBtn.textContent='Copy';
-        copyBtn.onclick=()=>{
-          navigator.clipboard.writeText(span.textContent);
-          const original=copyBtn.textContent;
-          copyBtn.textContent='Copied!';
-          setTimeout(()=>{copyBtn.textContent=original;},3000);
-        };
-        td.appendChild(document.createElement('br'));
-        td.appendChild(copyBtn);
-        tr.appendChild(td);
-      });
-      tableBody.appendChild(tr);
-    });
-    document.getElementById(type+'-table').style.display='table';
-  }
-</script>
+    data.push(bioObj);
+    // Add dummy bios for Software Tester
+    defaultBios.forEach(d=>data.push(d));
+    displayTable('bio', data, langs);
+    loading.style.display='none';
+  },500);
+}
 
-</body>
-</html>
+// Helper to display table
+function displayTable(type, data, langs){
+  const tableBody = document.getElementById(type+'-body');
+  const header = document.getElementById(type+'-header');
+  header.innerHTML=''; tableBody.innerHTML='';
+  langs.forEach(l=>{
+    const th=document.createElement('th'); th.textContent=l; header.appendChild(th);
+  });
+  data.forEach(item=>{
+    const tr=document.createElement('tr');
+    langs.forEach(l=>{
+      const td=document.createElement('td');
+      const span=document.createElement('span'); span.textContent=item[l]||''; td.appendChild(span);
+      const copyBtn=document.createElement('span'); copyBtn.className='copy-btn'; copyBtn.textContent='Copy';
+      copyBtn.onclick=()=>{
+        navigator.clipboard.writeText(span.textContent);
+        const original=copyBtn.textContent; copyBtn.textContent='Copied!';
+        setTimeout(()=>{copy
