@@ -19,9 +19,12 @@
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: top; position: relative; }
     #loading { display: none; color: #007bff; font-weight: bold; }
     .copy-btn {
-      cursor: pointer; position: absolute; bottom: 5px; right: 5px; font-size: 16px;
-      color: #007bff; user-select: none;
+      position: absolute; bottom: 5px; right: 5px;
+      font-size: 12px; padding: 2px 6px;
+      background-color: #007bff; color: #fff; border-radius: 4px;
+      cursor: pointer; user-select: none;
     }
+    .copy-btn:hover { background-color: #0056b3; }
   </style>
 </head>
 <body>
@@ -162,9 +165,9 @@ Format as JSON array with keys for each selected language.
         textSpan.textContent = item[lang] || '';
         td.appendChild(textSpan);
 
-        // Copy button at bottom-right
+        // Modern copy button at bottom-right
         const copyBtn = document.createElement('span');
-        copyBtn.innerHTML = '📋';
+        copyBtn.textContent = 'Copy';
         copyBtn.title = 'Copy';
         copyBtn.className = 'copy-btn';
         copyBtn.onclick = () => {
