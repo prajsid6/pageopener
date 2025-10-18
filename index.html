@@ -110,38 +110,49 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
   
   <button onclick="generateCaption()">Generate Captions</button>
   <button onclick="copyAllCaptions()">Copy All</button>
-  
   <div id="caption-output"></div>
-</div>
-
-<!-- Meme Generator -->
-<div id="meme" class="generator">
-  <h1>Meme Generator</h1>
-  <input id="meme-topic" placeholder="Enter meme idea...">
-  <button onclick="generateMeme()">Generate Meme</button>
-  <div id="meme-output"></div>
-</div>
-
-<!-- Bio Generator -->
-<div id="bio" class="generator">
-  <h1>Bio Generator</h1>
-  <textarea id="bio-input" placeholder="Enter your profession or vibe..."></textarea>
-  <button onclick="generateBio()">Generate Bios</button>
-  <div id="bio-output"></div>
 </div>
 
 <!-- Post Content Generator -->
 <div id="post" class="generator">
   <h1>Post Content Generator</h1>
   <textarea id="post-desc" placeholder="Describe your post idea..."></textarea>
-  <label>Choose Language:</label>
-  <select id="post-lang">
-    <option>English</option>
-    <option>Hindi</option>
-    <option>Kannada</option>
-  </select>
+  <label>Select Languages:</label>
+  <div class="language-buttons" id="post-langs">
+    <div class="lang-btn selected" data-lang="English">English</div>
+    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
+    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
+  </div>
   <button onclick="generatePost()">Generate Post</button>
   <div id="post-output"></div>
+</div>
+
+<!-- Bio Generator -->
+<div id="bio" class="generator">
+  <h1>Bio Generator</h1>
+  <textarea id="bio-input" placeholder="Enter your profession or vibe..."></textarea>
+  <label>Select Languages:</label>
+  <div class="language-buttons" id="bio-langs">
+    <div class="lang-btn selected" data-lang="English">English</div>
+    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
+    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
+  </div>
+  <button onclick="generateBio()">Generate Bios</button>
+  <div id="bio-output"></div>
+</div>
+
+<!-- Language Translator -->
+<div id="translate" class="generator">
+  <h1>Language Translator</h1>
+  <textarea id="translate-text" placeholder="Enter text to translate..."></textarea>
+  <label>Select Languages:</label>
+  <div class="language-buttons" id="translate-langs">
+    <div class="lang-btn selected" data-lang="English">English</div>
+    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
+    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
+  </div>
+  <button onclick="generateTranslate()">Translate</button>
+  <div id="translate-output"></div>
 </div>
 
 <!-- Video Downloader -->
@@ -150,20 +161,6 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
   <input id="video-url" placeholder="Enter video URL...">
   <button onclick="generateVideo()">Download</button>
   <div id="video-output"></div>
-</div>
-
-<!-- Language Translator -->
-<div id="translate" class="generator">
-  <h1>Language Translator</h1>
-  <textarea id="translate-text" placeholder="Enter text to translate..."></textarea>
-  <label>Translate To:</label>
-  <select id="translate-lang">
-    <option>English</option>
-    <option>Hindi</option>
-    <option>Kannada</option>
-  </select>
-  <button onclick="generateTranslate()">Translate</button>
-  <div id="translate-output"></div>
 </div>
 
 <!-- Profile Search -->
@@ -195,12 +192,15 @@ input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16p
   </div>
 </div>
 
-</div>
-
 <script>
 // Sidebar toggle
 document.getElementById('hamburger').onclick=()=>document.getElementById('sidebar').classList.toggle('hide');
 document.getElementById('disclaimer-btn').onclick=()=>document.getElementById('disclaimer').style.display='none';
+
+// Language button toggle for all sections
+document.querySelectorAll('.language-buttons .lang-btn').forEach(btn=>{
+  btn.onclick=()=>btn.classList.toggle('selected');
+});
 
 // Guest Login
 function initGuest(){
@@ -233,7 +233,7 @@ const topicEmojis={Food:'🍴 #Foodie #Yummy',Travel:'✈️ #Wanderlust #Advent
 function generateCaption(){
   const topic=document.getElementById('caption-topic').value.trim()||'Food';
   const count=parseInt(document.getElementById('caption-count').value)||3;
-  const langs=Array.from(document.querySelectorAll('.lang-btn.selected')).map(b=>b.dataset.lang);
+  const langs=Array.from(document.querySelectorAll('#caption-langs .lang-btn.selected')).map(b=>b.dataset.lang);
   let emoji=topicEmojis[topic]||topicEmojis['Default'];
   let output='';
   langs.forEach(lang=>{
@@ -253,47 +253,46 @@ function copyAllCaptions(){
   alert('All captions copied!');
 }
 
-// Meme Generator
-function generateMeme(){
-  const topic=document.getElementById('meme-topic').value||'Weekend';
+// Post Generator
+function generatePost(){
+  const desc=document.getElementById('post-desc').value||'Sharing thoughts';
+  const langs=Array.from(document.querySelectorAll('#post-langs .lang-btn.selected')).map(b=>b.dataset.lang);
   let output='';
-  for(let i=1;i<=3;i++){
-    output+=`<div class="generated-item"><p>Meme #${i}: ${topic} moments 😂</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
-  }
-  document.getElementById('meme-output').innerHTML=output;
+  langs.forEach(lang=>{
+    for(let i=1;i<=3;i++){
+      output+=`<div class="generated-item"><p>${lang} Post #${i}: ${desc}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
+    }
+  });
+  document.getElementById('post-output').innerHTML=output;
 }
 
 // Bio Generator
 function generateBio(){
   const input=document.getElementById('bio-input').value||'Software Tester';
+  const langs=Array.from(document.querySelectorAll('#bio-langs .lang-btn.selected')).map(b=>b.dataset.lang);
   let output='';
   const bios=[`${input} | Coffee Lover ☕`,`${input} | AI Enthusiast 🤖`,`${input} | Traveler ✈️`];
-  bios.forEach(b=>output+=`<div class="generated-item"><p>${b}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`);
+  langs.forEach(lang=>{
+    bios.forEach(b=>output+=`<div class="generated-item"><p>${lang}: ${b}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`);
+  });
   document.getElementById('bio-output').innerHTML=output;
 }
 
-// Post Generator
-function generatePost(){
-  const desc=document.getElementById('post-desc').value||'Sharing thoughts';
-  const lang=document.getElementById('post-lang').value;
+// Translator
+function generateTranslate(){
+  const text=document.getElementById('translate-text').value;
+  const langs=Array.from(document.querySelectorAll('#translate-langs .lang-btn.selected')).map(b=>b.dataset.lang);
   let output='';
-  for(let i=1;i<=3;i++){
-    output+=`<div class="generated-item"><p>${lang} Post #${i}: ${desc}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
-  }
-  document.getElementById('post-output').innerHTML=output;
+  langs.forEach(lang=>{
+    output+=`<div class="generated-item"><p>Translated to ${lang}: "${text}" (demo)</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
+  });
+  document.getElementById('translate-output').innerHTML=output;
 }
 
 // Video Downloader
 function generateVideo(){
   const url=document.getElementById('video-url').value;
   document.getElementById('video-output').innerHTML=`<p>Download ready: <a href="${url}" target="_blank">${url}</a></p>`;
-}
-
-// Translator
-function generateTranslate(){
-  const text=document.getElementById('translate-text').value;
-  const lang=document.getElementById('translate-lang').value;
-  document.getElementById('translate-output').innerHTML=`<p>Translated to ${lang}: "${text}" (demo)</p>`;
 }
 
 // Profile Search & Add Social
