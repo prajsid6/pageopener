@@ -1,375 +1,603 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Social Buddy</title>
-<style>
-body {margin:0;font-family:Arial;background:#fff;}
-#sidebar {position:fixed;left:0;top:0;width:200px;height:100%;background:#FFFC00;color:#333;display:flex;flex-direction:column;z-index:2;transition:0.3s;box-shadow:2px 0 5px rgba(0,0,0,0.1);}
-#sidebar.hide{left:-200px;}
-#sidebar h2{text-align:center;padding:10px;margin:0;font-size:18px;}
-#sidebar button{background:none;border:none;color:#333;text-align:left;padding:10px;cursor:pointer;font-size:16px;font-weight:bold;}
-#sidebar button:hover{background:#FFEB3B;}
-#sidebar-footer {margin-top:auto;padding:10px;text-align:center;font-size:12px;color:#333;border-top:1px solid #ddd;}
-#content{margin-left:200px;padding:20px;transition:0.3s;}
-#sidebar.hide + #content{margin-left:0;}
-#hamburger{position:fixed;top:10px;left:10px;font-size:26px;color:green;cursor:pointer;z-index:3;}
-h1{text-align:center;margin-top:0;}
-label{font-weight:bold;display:block;margin-top:10px;}
-input,textarea,button,select{width:100%;padding:8px;margin-top:5px;font-size:16px;border-radius:4px;border:1px solid #ccc;}
-.language-buttons{display:flex;flex-wrap:wrap;margin-bottom:10px;}
-.lang-btn{border:1px solid #ccc;border-radius:5px;padding:6px 12px;margin:3px;cursor:pointer;}
-.lang-btn.selected{background:#007bff;color:white;border-color:#007bff;}
-.generator{display:none;}
-.copy-btn{display:inline-block;background:#007bff;color:white;padding:3px 6px;border-radius:4px;cursor:pointer;margin-top:4px;font-size:12px;}
-.copy-btn:hover{background:#0056b3;}
-#disclaimer{background:#ffcc00;color:#333;padding:10px;text-align:center;position:fixed;top:0;left:0;width:100%;font-weight:bold;z-index:9999;}
-#disclaimer button{margin-left:10px;padding:4px 10px;cursor:pointer;}
-.social-card{text-align:center;margin:auto;margin-top:15px;max-width:180px;background:#f5f5f5;padding:10px;border-radius:10px;box-shadow:0 0 5px rgba(0,0,0,0.1);}
-.social-card img{width:100px;height:100px;border-radius:50%;}
-.social-icons{display:flex;justify-content:center;gap:10px;margin-top:10px;}
-.social-icons a{text-decoration:none;font-size:22px;color:#333;}
-.social-icons a:hover{color:#007bff;}
-.trending-container{margin-top:20px;background:#f7f7f7;padding:10px;border-radius:8px;box-shadow:0 0 5px rgba(0,0,0,0.1);}
-.trending-header{display:flex;justify-content:space-between;align-items:center;}
-.trending-header h3{margin:0;}
-.refresh-btn{background:#007bff;color:white;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:14px;}
-.refresh-btn:hover{background:#0056b3;}
-.trending-post{border-bottom:1px solid #ddd;padding:8px 0;}
-.trending-post:last-child{border:none;}
-.trending-post h4{margin:0;font-size:16px;color:#333;}
-.trending-post p{margin:4px 0;font-size:14px;}
-.trending-platform{font-size:12px;color:#555;}
-.generated-item{margin-bottom:8px;}
-#profile-output{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Browser Core</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Dark background */
+        }
+        /* Custom scrollbar for the assistant panel */
+        #agent-assistant-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        #agent-assistant-panel::-webkit-scrollbar-thumb {
+            background-color: #3b82f6; /* Blue */
+            border-radius: 4px;
+        }
+        #agent-assistant-panel::-webkit-scrollbar-track {
+            background: #161b22; /* Dark track */
+        }
+        .email-item:hover {
+            background-color: #2c323a;
+        }
+        .email-item.selected {
+            background-color: #1e242b;
+            border-left: 4px solid #3b82f6;
+        }
+        /* Ensure the iframe and local content fit the space */
+        .content-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+        #web-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #f7f7f7; /* Light background for external web pages */
+        }
+    </style>
 </head>
-<body>
+<body class="min-h-screen text-white">
+    <!-- Main Application Container -->
+    <div class="flex h-screen overflow-hidden">
 
-<!-- Disclaimer -->
-<div id="disclaimer">
-⚠️ Demo app — content is for reference only.
-<button id="disclaimer-btn">OKAY</button>
-</div>
+        <!-- 1. Simulated Browser Window (Left Panel) -->
+        <div class="w-2/3 flex flex-col bg-gray-900 shadow-xl">
 
-<div id="hamburger">☰</div>
+            <!-- 1a. Browser Address Bar & Navigation -->
+            <div class="flex-shrink-0 bg-gray-950 border-b border-gray-700 p-3 flex items-center space-x-2">
+                <input type="url" id="url-input" value="local://article"
+                       class="flex-grow p-2 text-sm rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                       placeholder="Enter URL (e.g., https://www.example.com)">
+                <button id="go-button"
+                        class="py-2 px-4 rounded-lg font-semibold text-white transition duration-200 bg-blue-600 hover:bg-blue-700 text-sm">
+                    Go
+                </button>
+            </div>
 
-<!-- Sidebar -->
-<div id="sidebar">
-  <h2>Social Media Buddy</h2>
-  <button onclick="showSection('dashboard')">Dashboard</button>
-  <button onclick="showSection('caption')">Caption Generator</button>
-  <button onclick="showSection('meme')">Meme Generator</button>
-  <button onclick="showSection('bio')">Bio Generator</button>
-  <button onclick="showSection('post')">Post Content Generator</button>
-  <button onclick="showSection('video')">Video Downloader</button>
-  <button onclick="showSection('translate')">Language Translator</button>
-  <button onclick="showSection('profile')">Profile Search</button>
-  <button onclick="showSection('card')">Social Card</button>
-  <div id="sidebar-footer">Developed by Praju</div>
-</div>
+            <!-- 1b. Page Content Container -->
+            <div id="browser-content-container" class="flex-grow overflow-y-auto">
+                <!-- Iframe for external (https) pages -->
+                <iframe id="web-iframe" class="hidden content-container"></iframe>
+                
+                <!-- Container for local (simulated) content pages -->
+                <div id="local-content" class="content-container p-6">
+                    <!-- Internal HTML content injected here by JS -->
+                </div>
+            </div>
+        </div>
 
-<!-- Main Content -->
-<div id="content">
+        <!-- 2. Agentic Assistant Sidebar (Right Panel) -->
+        <div class="w-1/3 flex flex-col bg-gray-950 border-l border-gray-700 p-4">
+            <header class="text-center pb-4 border-b border-gray-700">
+                <h2 class="text-xl font-bold text-blue-400">Agent Comet Assistant</h2>
+                <p class="text-xs text-gray-500">Your AI co-pilot for web tasks.</p>
+                <p id="user-id-display" class="text-xs text-gray-600 mt-1"></p>
+            </header>
 
-<!-- Dashboard -->
-<div id="dashboard" class="generator">
-  <h1>Dashboard</h1>
-  <p id="welcome"></p>
-  <button onclick="logout()" id="logout-btn" style="display:none;">Logout</button>
-  <h3>Analytics Overview</h3>
-  <p><b>Followers:</b> <span id="followers">0</span></p>
-  <p><b>Engagement Rate:</b> <span id="engagement">0%</span></p>
-  <p><b>Posts This Week:</b> <span id="posts">0</span></p>
+            <!-- Conversation/Response Panel -->
+            <div id="agent-assistant-panel" class="flex-grow overflow-y-auto my-4 space-y-4 rounded-lg p-2 bg-gray-900 border border-gray-800">
+                <div class="p-3 bg-blue-900/30 rounded-lg shadow-inner">
+                    <p class="text-sm font-semibold text-blue-300">Agent Prompt Ideas:</p>
+                    <ul class="list-disc list-inside text-xs text-gray-400 mt-1 space-y-1">
+                        <li>(On Local Page) "Summarize the section on materials."</li>
+                        <li>(On External Page) "Find recent stock news for companies related to this website."</li>
+                        <li>(On Email) "Draft a professional reply to the sender."</li>
+                    </ul>
+                    <p class="text-xs font-semibold text-red-300 mt-2">Note: For HTTPS pages, the Agent uses Google Search (Grounding) as it cannot read the live page content.</p>
+                </div>
+                <!-- LLM Responses go here -->
+            </div>
 
-  <!-- What's Trending -->
-  <div class="trending-container">
-    <div class="trending-header">
-      <h3>🔥 What's Trending</h3>
-      <button class="refresh-btn" onclick="loadTrending()">🔄 Refresh</button>
+            <!-- Input Form -->
+            <form id="agent-form" class="flex flex-col space-y-3 pt-4 border-t border-gray-700">
+                <textarea id="user-prompt"
+                          rows="3"
+                          class="w-full p-3 text-sm rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none placeholder-gray-500"
+                          placeholder="Ask Agent Comet to analyze the page or perform a task..."></textarea>
+                <button type="submit"
+                        id="send-button"
+                        class="w-full py-2 px-4 rounded-lg font-semibold text-white transition duration-200 bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/50 shadow-lg shadow-blue-500/30 flex items-center justify-center"
+                        aria-busy="false">
+                    <span id="button-text">Send Command</span>
+                    <svg id="loading-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </form>
+
+            <div class="mt-4 text-xs text-center text-gray-600">
+                Powered by Gemini API with Google Search grounding.
+            </div>
+        </div>
     </div>
-    <div id="trending-list"></div>
-  </div>
-</div>
 
-<!-- Caption Generator -->
-<div id="caption" class="generator">
-  <h1>Caption Generator</h1>
-  <input id="caption-topic" placeholder="Enter topic like Food, Travel...">
-  <label>Languages:</label>
-  <div class="language-buttons" id="caption-langs">
-    <div class="lang-btn selected" data-lang="English">English</div>
-    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
-    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
-  </div>
-  <label>Number of captions:</label>
-  <input id="caption-count" type="number" min="1" max="10" value="3">
-  <button onclick="generateCaption()">Generate Captions</button>
-  <div id="caption-output"></div>
-</div>
+    <!-- Firebase SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-<!-- Meme Generator -->
-<div id="meme" class="generator">
-  <h1>Meme Generator</h1>
-  <input id="meme-topic" placeholder="Enter meme idea...">
-  <label>Number of memes:</label>
-  <input id="meme-count" type="number" min="1" max="10" value="3">
-  <div class="language-buttons" id="meme-langs">
-    <div class="lang-btn selected" data-lang="English">English</div>
-    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
-    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
-  </div>
-  <button onclick="generateMeme()">Generate Meme</button>
-  <div id="meme-output"></div>
-</div>
+        // Global variables provided by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-<!-- Bio Generator -->
-<div id="bio" class="generator">
-  <h1>Bio Generator</h1>
-  <textarea id="bio-input" placeholder="Enter your profession or vibe..."></textarea>
-  <label>Number of bios:</label>
-  <input id="bio-count" type="number" min="1" max="10" value="3">
-  <div class="language-buttons" id="bio-langs">
-    <div class="lang-btn selected" data-lang="English">English</div>
-    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
-    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
-  </div>
-  <button onclick="generateBio()">Generate Bios</button>
-  <div id="bio-output"></div>
-</div>
+        let db, auth, userId = null;
+        let currentUrl = ''; 
+        let isExternalPage = false; // Flag to check if we are on an https page
 
-<!-- Post Generator -->
-<div id="post" class="generator">
-  <h1>Post Content Generator</h1>
-  <textarea id="post-desc" placeholder="Describe your post idea..."></textarea>
-  <label>Number of posts:</label>
-  <input id="post-count" type="number" min="1" max="10" value="3">
-  <label>Languages:</label>
-  <div class="language-buttons" id="post-langs">
-    <div class="lang-btn selected" data-lang="English">English</div>
-    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
-    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
-  </div>
-  <button onclick="generatePost()">Generate Post</button>
-  <div id="post-output"></div>
-</div>
+        // --- Simulated Content Definitions ---
+        const simulatedEmails = [
+            { id: 1, from: "Dr. Anya Sharma", subject: "Review of BIC Proposal Draft", time: "10:30 AM", snippet: "The initial draft for the Bio-Integrated Computing proposal looks promising...", body: "Dear Team,\n\nThe initial draft for the Bio-Integrated Computing proposal looks promising, especially the sections on transient hardware. However, I noticed the budget allocation for the quantum tunneling research seems underestimated. Could you please review the figures for the MIT/Stanford collaboration? We need to ensure we have contingencies for the hardware fabrication costs. Please send me a revised budget summary by end of day Friday. Also, can you confirm the deadline for the final submission is still next Tuesday? Thanks, Dr. Sharma." },
+            { id: 2, from: "NanoTech Daily Digest", subject: "Daily Brief: Graphene and Neural Networks", time: "9:15 AM", snippet: "New paper published on highly stable Graphene-based interfaces...", body: "Daily Briefing:\n\nA new landmark paper was published today detailing highly stable Graphene-based cortical interfaces. The researchers achieved a 5-year operational lifespan in preliminary trials. This is a massive leap forward for the field. Also included is a summary of the latest funding rounds for memory augmentation startups, with 'CognitoSystems' raising the largest seed round to date. We recommend checking out the full article link below for investment insights. (Note: This email content is for informational purposes only and does not constitute financial advice.)" },
+            { id: 3, from: "Regulatory Compliance Group", subject: "Action Required: Biotech Autonomy Act", time: "8:00 AM", snippet: "Important changes coming to EU regulations regarding biometric data...", body: "To all research leads,\n\nPlease be advised that the European Union's proposed 'Biotech Autonomy Act' is moving through the final review stages. This legislation will fundamentally change how we handle and store biometric data derived from neural implants. We must immediately update our user consent forms and data handling protocols to ensure compliance with the new proposed standards regarding the nervous system. Failure to update protocols before the end of the quarter could result in severe penalties. Please schedule a mandatory meeting with your teams to review the new policy guidelines attached (internal document 45B). Regards, Compliance." }
+        ];
 
-<!-- Video Downloader -->
-<div id="video" class="generator">
-  <h1>Video Downloader</h1>
-  <input id="video-url" placeholder="Enter video URL...">
-  <button onclick="generateVideo()">Download</button>
-  <div id="video-output"></div>
-</div>
+        const articlePageHTML = `
+            <div class="max-w-3xl mx-auto p-6 bg-gray-800 rounded-xl shadow-2xl">
+                <header class="mb-8">
+                    <h1 class="text-4xl font-extrabold text-blue-400 mb-2">The Quiet Revolution of Bio-Integrated Computing</h1>
+                    <p class="text-sm text-gray-400">Published on <time datetime="2025-11-15">November 15, 2025</time> by Dr. Elara Vance</p>
+                    <hr class="mt-4 border-gray-700">
+                </header>
+                <section class="prose prose-invert max-w-none text-gray-300" id="article-content-text">
+                    <p><strong>Bio-Integrated Computing (BIC)</strong> marks a profound paradigm shift, moving technology from external devices to seamless organic integration. This field is rapidly advancing beyond simple wearables, focusing instead on interfaces that directly interact with biological systems—nerves, cells, and even DNA. The foundational research is centered on biocompatible material science and ultra-low-power neural signal processing.</p>
+                    <h2 class="text-2xl font-bold text-blue-300 mt-6 mb-3">Material Science Breakthroughs</h2>
+                    <p>Recent advances in flexible electronics, particularly using graphene and silk fibroin, have been critical. Graphene's exceptional conductivity and thinness make it an ideal candidate for cortical implants. In a landmark study published last month (referenced below), researchers demonstrated a silk-based matrix that dissolved harmlessly into tissue after three weeks, leaving behind only the functional nano-circuitry. This transient hardware approach significantly mitigates the long-term risk of immune response and scar tissue formation, which have historically been major hurdles in neural interface design. The key finding was the reduction of glial scarring by nearly 85% compared to traditional rigid silicon electrodes.</p>
+                    <h2 class="text-2xl font-bold text-blue-300 mt-6 mb-3">Ethical and Regulatory Landscape</h2>
+                    <p>The acceleration of BIC necessitates immediate and robust ethical oversight. Concerns range from data privacy—as the technology generates incredibly sensitive biometric data streams—to issues of equity and access. Currently, the European Union is proposing the 'Biotech Autonomy Act' to regulate the commercialization of consumer-grade neural interfaces, focusing heavily on user consent for data derived directly from the nervous system. This regulatory push is crucial as companies begin to transition from therapeutic devices (like cochlear implants) to enhancement technologies (like memory augmentation). The market capitalization of the top three BIC startups collectively exceeded $50 billion this quarter, indicating explosive commercial interest.</p>
+                    <h2 class="text-2xl font-bold text-blue-300 mt-6 mb-3">Future Outlook</h2>
+                    <p>Experts predict that within five years, BIC technology will move into mainstream health diagnostics, offering continuous, real-time internal monitoring far superior to current non-invasive methods. However, the path to mass adoption hinges entirely on minimizing computational power requirements. An active neural implant must operate on microwatt levels to avoid excessive heat generation that could damage surrounding biological tissue. Research teams at MIT and Stanford are currently exploring quantum tunneling effects in semiconductors to achieve this ultra-efficient processing.</p>
+                </section>
+            </div>
+        `;
+        
+        // --- Utility Functions ---
 
-<!-- Language Translator -->
-<div id="translate" class="generator">
-  <h1>Language Translator</h1>
-  <textarea id="translate-text" placeholder="Enter text to translate..."></textarea>
-  <div class="language-buttons" id="translate-langs">
-    <div class="lang-btn selected" data-lang="English">English</div>
-    <div class="lang-btn selected" data-lang="Hindi">Hindi</div>
-    <div class="lang-btn selected" data-lang="Kannada">Kannada</div>
-  </div>
-  <button onclick="generateTranslate()">Translate</button>
-  <div id="translate-output"></div>
-</div>
+        // Utility function to convert markdown text to HTML for display
+        const renderMarkdown = (markdown) => {
+            // Simple markdown to HTML for presentation
+            let html = markdown
+                .replace(/### (.*)/g, '<h3>$1</h3>')
+                .replace(/## (.*)/g, '<h2>$1</h2>')
+                .replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\* ([^\n]+)/g, '<li>$1</li>')
+                .replace(/\n\n/g, '<p>')
+                .replace(/\n/g, '<br/>');
+            // Wrap list items in ul if they exist
+            if (html.includes('<li>')) {
+                html = html.replace(/((?:<li>.*?<\/li>)+)/gs, '<ul>$1</ul>');
+            }
+            return html;
+        };
+        
+        // Function to get content from the active page for the Agent's context
+        function getCurrentPageContent() {
+            const localContent = document.getElementById('local-content');
 
-<!-- Profile Search -->
-<div id="profile" class="generator">
-  <h1>Profile Search</h1>
-  <input id="profile-name" placeholder="Enter username...">
-  <button onclick="searchProfile()">Search Profiles</button>
-  <div id="profile-output"></div>
-</div>
+            if (isExternalPage) {
+                // Agent cannot read the DOM of the external HTTPS page due to security, 
+                // so we instruct the LLM to use the URL itself with its search tool.
+                return `The current page is an external website (${currentUrl}). Due to security restrictions, the Agent cannot read the DOM content directly. Please formulate your request as a search query related to this URL.`;
+            }
+            
+            if (currentUrl === 'local://article') {
+                return localContent.innerText;
+            } 
+            
+            if (currentUrl === 'local://inbox') {
+                const viewer = document.getElementById('email-content-viewer');
+                
+                // Check if an email is selected
+                if (viewer && viewer.dataset.emailId) {
+                    const selectedEmail = simulatedEmails.find(e => e.id === parseInt(viewer.dataset.emailId));
+                    if (selectedEmail) {
+                        return `CURRENT CONTEXT IS SELECTED EMAIL. Subject: ${selectedEmail.subject}. From: ${selectedEmail.from}. Body: ${selectedEmail.body}`;
+                    }
+                }
+                return "You are viewing the Email Inbox folder list page. No specific email content is currently selected for analysis.";
+            }
 
-<!-- Social Card -->
-<div id="card" class="generator">
-  <h1>Social Card</h1>
-  <div class="social-card">
-    <img src="https://via.placeholder.com/100" alt="Profile">
-    <h3 id="card-name">Guest User</h3>
-    <p>Follow me on:</p>
-    <div class="social-icons">
-      <a href="https://instagram.com/" target="_blank">📸</a>
-      <a href="https://twitter.com/" target="_blank">🐦</a>
-      <a href="https://linkedin.com/" target="_blank">💼</a>
-      <a href="https://youtube.com/" target="_blank">▶️</a>
-    </div>
-  </div>
-</div>
+            return "No active content page found for analysis.";
+        }
 
-</div>
 
-<script>
-// Hamburger toggle
-document.getElementById('hamburger').onclick=()=>document.getElementById('sidebar').classList.toggle('hide');
+        // --- Firebase Initialization and Auth ---
 
-// Disclaimer
-document.getElementById('disclaimer-btn').onclick=()=>document.getElementById('disclaimer').style.display='none';
+        async function initFirebase() {
+            setLogLevel('Debug');
+            if (!firebaseConfig) {
+                console.error("Firebase config not found.");
+                return;
+            }
+            
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
 
-// Guest Login
-function initGuest(){
-  let name=sessionStorage.getItem('guestName');
-  if(!name){name=prompt("Enter your name to start:","Guest User")||"Guest User";sessionStorage.setItem('guestName',name);}
-  document.getElementById('welcome').textContent="Welcome, "+name+"!";
-  document.getElementById('card-name').textContent=name;
-  document.getElementById('logout-btn').style.display='inline-block';
-}
-initGuest();
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                userId = auth.currentUser?.uid || crypto.randomUUID();
+                document.getElementById('user-id-display').textContent = `User ID: ${userId.substring(0, 8)}...`;
+                console.log("Firebase initialized and user authenticated:", userId);
 
-function logout(){sessionStorage.removeItem('guestName');location.reload();}
+            } catch (error) {
+                console.error("Firebase authentication failed:", error);
+            }
+        }
 
-// Show Section
-function showSection(id){
-  document.querySelectorAll('.generator').forEach(g=>g.style.display='none');
-  document.getElementById(id).style.display='block';
-}
-showSection('dashboard');
+        // --- LLM Agent Core Logic ---
 
-// Helper: toggle language button
-document.querySelectorAll('.language-buttons .lang-btn').forEach(btn=>{
-  btn.onclick=()=>btn.classList.toggle('selected');
-});
+        // Function to handle the API call with exponential backoff
+        async function callGeminiApiWithBackoff(payload, maxRetries = 5, delay = 1000) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
-// Copy function
-function copyText(btn){
-  const text=btn.parentElement.querySelector('p').textContent.trim();
-  navigator.clipboard.writeText(text);
-  btn.textContent="Copied!";
-  setTimeout(()=>btn.textContent="Copy",2000);
-}
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
 
-// Caption Generator
-function generateCaption(){
-  const topic=document.getElementById('caption-topic').value||'Food';
-  const count=parseInt(document.getElementById('caption-count').value)||3;
-  const langs=Array.from(document.querySelectorAll('#caption-langs .lang-btn.selected')).map(b=>b.dataset.lang);
-  let output='';
-  langs.forEach(lang=>{
-    for(let i=0;i<count;i++){
-      output+=`<div class="generated-item"><p>${lang} Caption #${i+1}: Delicious vibes on ${topic} 🍴</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
-    }
-  });
-  document.getElementById('caption-output').innerHTML=output;
-}
+                    if (response.status === 429) {
+                        if (i < maxRetries - 1) {
+                            console.warn(`Rate limit exceeded. Retrying in ${delay}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            delay *= 2; // Exponential backoff
+                            continue;
+                        } else {
+                            throw new Error("API Rate limit exceeded after multiple retries.");
+                        }
+                    }
 
-// Meme Generator
-function generateMeme(){
-  const topic=document.getElementById('meme-topic').value||'Weekend';
-  const count=parseInt(document.getElementById('meme-count').value)||3;
-  const langs=Array.from(document.querySelectorAll('#meme-langs .lang-btn.selected')).map(b=>b.dataset.lang);
-  let output='';
-  langs.forEach(lang=>{
-    for(let i=0;i<count;i++){
-      output+=`<div class="generated-item"><p>${lang} Meme #${i+1}: When you realize ${topic} is over 😭</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
-    }
-  });
-  document.getElementById('meme-output').innerHTML=output;
-}
+                    if (!response.ok) {
+                        const errorBody = await response.json();
+                        throw new Error(`API call failed: ${response.status} ${response.statusText}. Details: ${JSON.stringify(errorBody)}`);
+                    }
 
-// Bio Generator
-function generateBio(){
-  const input=document.getElementById('bio-input').value||'Software Tester';
-  const count=parseInt(document.getElementById('bio-count').value)||3;
-  const langs=Array.from(document.querySelectorAll('#bio-langs .lang-btn.selected')).map(b=>b.dataset.lang);
-  let output='';
-  langs.forEach(lang=>{
-    for(let i=0;i<count;i++){
-      output+=`<div class="generated-item"><p>${lang} Bio #${i+1}: ${input} | Coffee Lover ☕</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
-    }
-  });
-  document.getElementById('bio-output').innerHTML=output;
-}
+                    return await response.json();
 
-// Post Generator
-function generatePost(){
-  const desc=document.getElementById('post-desc').value||'Sharing thoughts';
-  const count=parseInt(document.getElementById('post-count').value)||3;
-  const langs=Array.from(document.querySelectorAll('#post-langs .lang-btn.selected')).map(b=>b.dataset.lang);
-  let output='';
-  langs.forEach(lang=>{
-    for(let i=0;i<count;i++){
-      output+=`<div class="generated-item"><p>${lang} Post #${i+1}: ${desc}</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
-    }
-  });
-  document.getElementById('post-output').innerHTML=output;
-}
+                } catch (error) {
+                    console.error("Error during Gemini API fetch:", error);
+                    if (i === maxRetries - 1) throw error;
+                    // For other errors, still apply backoff
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
 
-// Video Downloader
-function generateVideo(){
-  const url=document.getElementById('video-url').value;
-  document.getElementById('video-output').innerHTML=`<p>Download ready: <a href="${url}" target="_blank">${url}</a></p>`;
-}
+        async function runAgent(userPrompt) {
+            const assistantPanel = document.getElementById('agent-assistant-panel');
+            const webpageContent = getCurrentPageContent(); // Dynamically get content
+            const button = document.getElementById('send-button');
+            const buttonText = document.getElementById('button-text');
+            const loadingSpinner = document.getElementById('loading-spinner');
 
-// Translate
-function generateTranslate(){
-  const text=document.getElementById('translate-text').value;
-  const langs=Array.from(document.querySelectorAll('#translate-langs .lang-btn.selected')).map(b=>b.dataset.lang);
-  let output='';
-  langs.forEach(lang=>{
-    output+=`<div class="generated-item"><p>Translated to ${lang}: "${text}" (demo)</p><div class='copy-btn' onclick='copyText(this)'>Copy</div></div>`;
-  });
-  document.getElementById('translate-output').innerHTML=output;
-}
+            // Agent validation and guard clauses
+            if (webpageContent.includes("No specific email content is currently selected")) {
+                const errorBubble = createAgentBubble('red');
+                errorBubble.querySelector('span:last-child').innerHTML = `Please select a specific email from the list before asking me to summarize or draft a reply.`;
+                assistantPanel.appendChild(errorBubble);
+                assistantPanel.scrollTop = assistantPanel.scrollHeight;
+                document.getElementById('user-prompt').value = '';
+                return;
+            }
 
-// Profile Search
-function searchProfile(){
-  const name=document.getElementById('profile-name').value.trim();
-  if(!name) return alert("Enter a username");
-  const platforms = [
-    {name:'Instagram', url:`https://instagram.com/${name}`, icon:'📸'},
-    {name:'Twitter', url:`https://twitter.com/${name}`, icon:'🐦'},
-    {name:'LinkedIn', url:`https://linkedin.com/in/${name}`, icon:'💼'},
-    {name:'YouTube', url:`https://youtube.com/@${name}`, icon:'▶️'}
-  ];
-  const output = platforms.map(p=>`
-    <div class="social-card">
-      <h4>${p.icon} ${p.name}</h4>
-      <p>@${name}</p>
-      <a href="${p.url}" target="_blank">Visit</a>
-    </div>
-  `).join('');
-  document.getElementById('profile-output').innerHTML=output;
-}
+            // 1. Show Loading State
+            button.setAttribute('aria-busy', 'true');
+            buttonText.textContent = 'Agent Thinking...';
+            loadingSpinner.classList.remove('hidden');
+            button.disabled = true;
 
-// Dashboard Analytics
-function randomize(){
-  document.getElementById('followers').textContent=Math.floor(Math.random()*5000+1000);
-  document.getElementById('engagement').textContent=(Math.random()*10).toFixed(2)+"%";
-  document.getElementById('posts').textContent=Math.floor(Math.random()*7+1);
-}
-randomize();
+            // 2. Add user prompt to panel
+            const userBubble = document.createElement('div');
+            userBubble.className = 'p-3 bg-blue-600 rounded-xl rounded-br-none max-w-[85%] ml-auto text-sm shadow-md';
+            userBubble.innerHTML = `<span class="font-semibold">You:</span> ${userPrompt}`;
+            assistantPanel.appendChild(userBubble);
+            assistantPanel.scrollTop = assistantPanel.scrollHeight;
 
-// Trending Section
-function loadTrending(){
-  const platforms=["Instagram","Twitter","YouTube","LinkedIn"];
-  const samplePosts=[
-    "Exploring hidden gems around the world 🌍",
-    "AI is transforming how we create and share ideas 🤖",
-    "Dance Challenge hits 10M views in 3 days! 💃",
-    "Remote jobs are evolving — 2025 trends you must see 💼",
-    "Street food diaries from Bengaluru 🍲",
-    "Photography hacks to get viral shots 📸"
-  ];
-  let posts=[];
-  for(let i=0;i<4;i++){
-    posts.push({
-      platform:platforms[i],
-      title:samplePosts[Math.floor(Math.random()*samplePosts.length)],
-      text:"Trending now on "+platforms[i]+"!"
-    });
-  }
-  const list=document.getElementById('trending-list');
-  list.innerHTML=posts.map(p=>`
-    <div class="trending-post">
-      <h4>${p.title}</h4>
-      <p>${p.text}</p>
-      <span class="trending-platform">📱 ${p.platform}</span>
-    </div>`).join('');
-}
-loadTrending();
+            // 3. Construct LLM Prompt and Payload
+            const systemPrompt = `You are 'Agent Comet,' a helpful, professional, and concise Agentic Browser Assistant. Your task is to analyze the provided 'CURRENT PAGE CONTEXT' and the 'USER REQUEST'. Based on both, fulfill the user's goal. Always be factual. If the request requires external, real-time information (e.g., finding stock prices, looking up current regulations, or searching for related news), you MUST use the Google Search tool. Provide the final response in Markdown format.`;
 
-</script>
+            let fullQuery;
+            if (isExternalPage) {
+                 // For external pages, the context is the URL itself
+                fullQuery = `CURRENT PAGE CONTEXT: The user is viewing an external website, but I cannot access its content. The URL is ${currentUrl}. USER REQUEST: ${userPrompt}`;
+            } else {
+                // For internal pages, use the actual content
+                fullQuery = `CURRENT PAGE CONTEXT (URL: ${currentUrl}):\n---\n${webpageContent}\n---\nUSER REQUEST: ${userPrompt}`;
+            }
+            
+            const payload = {
+                contents: [{ parts: [{ text: fullQuery }] }],
+                tools: [{ "google_search": {} }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+            };
+
+            const agentBubble = createAgentBubble('gray');
+            agentBubble.querySelector('span:last-child').innerHTML = `...analyzing... ${isExternalPage ? ' (Using web search to interpret URL)' : ''}`;
+            assistantPanel.appendChild(agentBubble);
+            assistantPanel.scrollTop = assistantPanel.scrollHeight;
+
+            const responseId = agentBubble.querySelector('span:last-child').id;
+
+            try {
+                const result = await callGeminiApiWithBackoff(payload);
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const text = candidate.content.parts[0].text;
+                    let sources = [];
+
+                    // Extract grounding sources
+                    const groundingMetadata = candidate.groundingMetadata;
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                        sources = groundingMetadata.groundingAttributions
+                            .map(attribution => ({
+                                uri: attribution.web?.uri,
+                                title: attribution.web?.title,
+                            }))
+                            .filter(source => source.uri && source.title);
+                    }
+
+                    // 4. Render Response
+                    let htmlContent = renderMarkdown(text);
+
+                    if (sources.length > 0) {
+                        htmlContent += '<div class="mt-3 pt-2 border-t border-gray-600">';
+                        htmlContent += '<p class="text-xs font-semibold text-gray-400 mb-1">Sources (via Google Search):</p>';
+                        htmlContent += '<ul class="list-disc list-inside text-xs text-gray-500 space-y-0.5">';
+                        sources.forEach((source, index) => {
+                            htmlContent += `<li><a href="${source.uri}" target="_blank" class="text-blue-400 hover:text-blue-300 underline">${source.title || `Source ${index + 1}`}</a></li>`;
+                        });
+                        htmlContent += '</ul></div>';
+                    }
+
+                    document.getElementById(responseId).innerHTML = htmlContent;
+
+                } else {
+                    document.getElementById(responseId).textContent = "Sorry, I couldn't generate a response for that request. The model may have blocked the content.";
+                }
+
+            } catch (error) {
+                console.error("Agent execution error:", error);
+                document.getElementById(responseId).innerHTML = `<span class="text-red-400">Error:</span> Failed to connect to the agent. Check the console for details.`;
+            } finally {
+                // 5. Hide Loading State
+                button.setAttribute('aria-busy', 'false');
+                buttonText.textContent = 'Send Command';
+                loadingSpinner.classList.add('hidden');
+                button.disabled = false;
+                document.getElementById('user-prompt').value = '';
+                assistantPanel.scrollTop = assistantPanel.scrollHeight;
+            }
+        }
+
+        // Helper to create agent bubble with unique ID
+        function createAgentBubble(color) {
+            const agentBubble = document.createElement('div');
+            agentBubble.className = `p-3 bg-gray-700 rounded-xl rounded-tl-none max-w-[90%] text-sm shadow-md`;
+            agentBubble.innerHTML = `<span class="font-semibold text-blue-300">Agent Comet:</span> <span id="agent-response-${Date.now()}"></span>`;
+            return agentBubble;
+        }
+
+        // --- UI/Page Navigation Logic ---
+
+        function navigate(url) {
+            url = url.toLowerCase().trim();
+            document.getElementById('url-input').value = url;
+            currentUrl = url;
+
+            const iframe = document.getElementById('web-iframe');
+            const localContent = document.getElementById('local-content');
+            localContent.innerHTML = '';
+            
+            // Check if it's an external page
+            isExternalPage = url.startsWith('https://') || url.startsWith('http://');
+
+            if (isExternalPage) {
+                // Show Iframe, hide local content
+                localContent.classList.add('hidden');
+                iframe.classList.remove('hidden');
+                iframe.src = url;
+            } else if (url === 'local://article') {
+                // Show local article content
+                iframe.classList.add('hidden');
+                localContent.classList.remove('hidden');
+                localContent.innerHTML = articlePageHTML;
+            } else if (url === 'local://inbox') {
+                // Show local email content
+                iframe.classList.add('hidden');
+                localContent.classList.remove('hidden');
+                localContent.innerHTML = generateEmailPageHTML();
+                renderEmailList();
+            } else {
+                // Show 404
+                iframe.classList.add('hidden');
+                localContent.classList.remove('hidden');
+                localContent.innerHTML = generate404HTML(url);
+            }
+            document.getElementById('browser-content-container').scrollTop = 0;
+        }
+        
+        // --- HTML Generation Functions for Local Pages ---
+
+        function generate404HTML(url) {
+            return `
+                <div class="max-w-xl mx-auto p-8 bg-gray-800 rounded-xl shadow-2xl text-center mt-20">
+                    <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.772-1.333-2.688-1.333-3.464 0L3.34 16c-.772 1.333.192 3 1.732 3z"></path></svg>
+                    <h1 class="text-3xl font-bold text-red-400 mb-2">404: Page Not Found</h1>
+                    <p class="text-gray-400">The simulated browser could not load the requested URL: <span id="error-url" class="font-mono text-blue-300">${url}</span></p>
+                    <p class="text-sm text-gray-500 mt-4">Try using known paths like <code class="bg-gray-700 p-1 rounded">local://article</code> or a real URL like <code class="bg-gray-700 p-1 rounded">https://www.google.com</code>.</p>
+                </div>
+            `;
+        }
+
+        function generateEmailPageHTML() {
+            return `
+                <div class="flex h-full">
+                    <!-- Email Sidebar (Folders) -->
+                    <nav class="w-1/4 flex-shrink-0 bg-gray-800 p-4 rounded-l-xl border-r border-gray-700">
+                        <div class="space-y-2">
+                            <div class="text-lg font-bold mb-4 text-blue-400">Mailbox</div>
+                            <button class="flex items-center w-full p-3 rounded-lg bg-blue-600/20 text-blue-300 font-medium">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2h4m2-5h10v-4m-5 5v4"></path></svg>
+                                Inbox (3)
+                            </button>
+                            <button class="flex items-center w-full p-3 rounded-lg text-gray-400 hover:bg-gray-700 transition">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                Sent
+                            </button>
+                            <button class="flex items-center w-full p-3 rounded-lg text-gray-400 hover:bg-gray-700 transition">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.243-8.243z"></path></svg>
+                                Drafts
+                            </button>
+                            <button class="flex items-center w-full p-3 rounded-lg text-gray-400 hover:bg-gray-700 transition">
+                                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Trash
+                            </button>
+                        </div>
+                    </nav>
+
+                    <!-- Email List (Middle Panel) -->
+                    <div id="email-list-panel" class="w-1/3 flex-shrink-0 bg-gray-950 overflow-y-auto border-r border-gray-700">
+                        <!-- Email list populated by JS -->
+                    </div>
+
+                    <!-- Email Content Viewer (Right Panel) -->
+                    <div id="email-content-viewer" data-email-id="" class="w-2/3 flex-grow bg-gray-900 p-6 overflow-y-auto">
+                        <div class="text-gray-400 text-center mt-20">
+                            Select an email to view its content and interact with Agent Comet.
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Email App Logic ---
+
+        function renderEmailList() {
+            const listPanel = document.getElementById('email-list-panel');
+            if (!listPanel) return; 
+
+            listPanel.innerHTML = '';
+            simulatedEmails.forEach(email => {
+                const item = document.createElement('div');
+                item.className = 'email-item p-4 border-b border-gray-700 cursor-pointer transition duration-150';
+                item.dataset.emailId = email.id;
+                item.innerHTML = `
+                    <div class="flex justify-between items-center text-sm mb-1">
+                        <span class="font-bold text-gray-200">${email.from}</span>
+                        <span class="text-xs text-gray-500">${email.time}</span>
+                    </div>
+                    <div class="text-sm font-semibold text-gray-300 truncate">${email.subject}</div>
+                    <p class="text-xs text-gray-500 truncate mt-0.5">${email.snippet}</p>
+                `;
+                item.addEventListener('click', () => selectEmail(email));
+                listPanel.appendChild(item);
+            });
+        }
+
+        function selectEmail(email) {
+            const viewer = document.getElementById('email-content-viewer');
+            
+            // Update selected style
+            document.querySelectorAll('.email-item').forEach(item => item.classList.remove('selected'));
+            document.querySelector(`.email-item[data-email-id="${email.id}"]`).classList.add('selected');
+
+            // Set content viewer data and HTML
+            viewer.dataset.emailId = email.id;
+            viewer.innerHTML = `
+                <div class="flex items-center justify-between border-b border-gray-700 pb-4 mb-4">
+                    <h2 class="text-2xl font-bold text-white">${email.subject}</h2>
+                    <div class="text-xs text-gray-400">${email.time}</div>
+                </div>
+                <div class="flex items-center text-sm mb-6">
+                    <span class="font-semibold text-blue-300 mr-2">From:</span>
+                    <span class="text-gray-300">${email.from}</span>
+                </div>
+                <div class="prose prose-invert max-w-none text-gray-300 whitespace-pre-line">
+                    ${email.body.replace(/\n/g, '<br>')}
+                </div>
+                
+                <div class="mt-8 pt-4 border-t border-gray-700 flex justify-end space-x-3">
+                    <button class="py-1 px-3 bg-gray-700 rounded-lg text-sm text-white hover:bg-gray-600 transition">Reply</button>
+                    <button class="py-1 px-3 bg-gray-700 rounded-lg text-sm text-white hover:bg-gray-600 transition">Forward</button>
+                    <button class="py-1 px-3 bg-red-700 rounded-lg text-sm text-white hover:bg-red-600 transition">Delete</button>
+                </div>
+            `;
+            // Scroll to the top of the email content
+            viewer.scrollTop = 0;
+        }
+
+
+        // --- Event Listeners and Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+            
+            // Start on the default page
+            navigate('local://article');
+
+            const urlInput = document.getElementById('url-input');
+            const goButton = document.getElementById('go-button');
+            const agentForm = document.getElementById('agent-form');
+            const promptInput = document.getElementById('user-prompt');
+
+            // Handle URL navigation via Go button
+            goButton.addEventListener('click', () => {
+                let url = urlInput.value.trim();
+                // Prepend https:// if user types domain only for convenience
+                if (!url.match(/^https?:\/\//i) && url.includes('.')) {
+                    url = 'https://' + url;
+                }
+                navigate(url);
+            });
+
+            // Handle URL navigation via Enter key in the address bar
+            urlInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    goButton.click();
+                }
+            });
+            
+            // Handle Agent Form submission
+            agentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const userPrompt = promptInput.value.trim();
+                if (userPrompt) {
+                    runAgent(userPrompt);
+                }
+            });
+
+            // Handle Shift+Enter for new line, Enter for submission in the agent input
+            promptInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    agentForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+
+    </script>
 </body>
 </html>
+
